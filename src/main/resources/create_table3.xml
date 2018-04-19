@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<configuration>
+    <depends-on>
+        <id>insert1.hql</id>
+        <id>insert2.hql</id>
+    </depends-on>
+</configuration>
+
