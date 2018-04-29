@@ -22,8 +22,7 @@ public class Kerberos {
     private static final String KERBEROS_PRINCIPAL;
 
     private static final ImmutableConfiguration CONFIG;
-    private final static Logger log = LoggerFactory.getLogger(Kerberos.class);
-    private static Kerberos me;
+    private static final Logger log = LoggerFactory.getLogger(Kerberos.class);
 
     static {
         CONFIG = ConfigurationService.getConfiguration();
@@ -34,9 +33,8 @@ public class Kerberos {
     }
 
     public static void auth() {
-        if (me == null)
-            me = new Kerberos();
-        me.auth_cmd();
+        if (KERBEROS_PRINCIPAL != null || KERBEROS_USERNAME != null || KERBEROS_PASSWORD != null)
+            auth_cmd();
     }
 
     private static String runCmd(String cmd, String input) {
@@ -66,19 +64,20 @@ public class Kerberos {
         return sb.toString();
     }
 
-    private String getLoginDomain() {
+    private static String getLoginDomain() {
         String s = KERBEROS_USERNAME + "@" + KERBEROS_PRINCIPAL;
         log.trace("Kerberos LoginDomain: " + s);
         return s;
     }
 
-    private void auth_cmd() {
+    private static void auth_cmd() {
         String logon = " kinit " + getLoginDomain();
         log.trace("Attempting Kerberos logon using: " + logon);
         log.trace("Logon: " + runCmd(logon, KERBEROS_PASSWORD));
         log.trace("klist returns: " + runCmd("klist", null));
     }
 
+    @SuppressWarnings("unused")
     private class MyCallbackHandler implements CallbackHandler {
         public void handle(Callback[] callbacks)
                 throws UnsupportedCallbackException {

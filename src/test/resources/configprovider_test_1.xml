@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <configuration>
-    <depends-on>
-        <id>drop_table2.hql</id>
-    </depends-on>
+    <test>
+        foo
+    </test>
+    <test3>
+        foo
+    </test3>
 </configuration>
+ 
 

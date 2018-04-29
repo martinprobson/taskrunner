@@ -15,7 +15,15 @@ import javax.sql.DataSource;
  */
 public class DBSource {
 
-    public static DataSource setupDataSource() {
+    private static DataSource dataSource;
+
+    public static DataSource get() {
+        if (dataSource == null)
+            dataSource = setupDataSource();
+        return dataSource;
+    }
+
+    private static DataSource setupDataSource() {
         //
         // First, we'll create a ConnectionFactory that the
         // pool will use to create Connections.
@@ -23,7 +31,6 @@ public class DBSource {
         // using the connect string passed in the command line
         // arguments.
         //
-
         ConnectionFactory connectionFactory =
                 new DBConnection();
 
@@ -52,7 +59,6 @@ public class DBSource {
         // Finally, we create the PoolingDriver itself,
         // passing in the object pool we created.
         //
-
         return new PoolingDataSource<>(connectionPool);
 
     }

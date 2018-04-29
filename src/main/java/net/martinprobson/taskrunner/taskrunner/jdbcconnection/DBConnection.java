@@ -54,6 +54,7 @@ class DBConnection implements ConnectionFactory {
     /**
      * Allow callback (URLAppender) class to be added to allow connection URL to be modified with custom hive parameters.
      */
+    @SuppressWarnings("unused")
     public static void addURLAppender(URLAppender appender) {
         appenders.add(appender);
     }
@@ -63,7 +64,7 @@ class DBConnection implements ConnectionFactory {
      */
     @Override
     public Connection createConnection() throws SQLException {
-        log.trace("Get connection: URL: " + url + " User: " + JDBC_USERNAME);
+        log.trace("Got connection: URL: " + url + " User: " + JDBC_USERNAME);
         Kerberos.auth();
         return DriverManager.getConnection(url, JDBC_USERNAME, JDBC_PASSWORD);
     }

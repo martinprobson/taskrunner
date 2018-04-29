@@ -1,4 +1,8 @@
-package net.martinprobson.taskrunner;
+package net.martinprobson.main;
+
+import net.martinprobson.taskrunner.DependentTask;
+import net.martinprobson.taskrunner.DummyTask;
+import net.martinprobson.taskrunner.TaskBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +10,7 @@ import java.util.Map;
 /**
  * ManualTaskBuilder - Build a list of tasks manually.
  */
-class ManualTaskBuilder extends TaskBuilder {
+class ManualTaskBuilder implements TaskBuilder {
 
     public Map<String, DependentTask> build() {
         HashMap<String, DependentTask> tasks = new HashMap<>();
@@ -14,10 +18,7 @@ class ManualTaskBuilder extends TaskBuilder {
                 "insert1", "insert2", "create_table3"};
         for (String task : taskNames) {
             DependentTask t;
-            if (task.equals("insert1"))
-                t = new DummyTask(task + ".hql", task + ".xml");
-            else
-                t = new DummyTask(task + ".hql", task + ".xml");
+            t = new DummyTask(task + ".hql", task + ".xml");
             tasks.put(t.getId(), t);
         }
 

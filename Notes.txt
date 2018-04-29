@@ -1,0 +1,29 @@
+public interface JDBCTaskBuilder {
+	AbstractTask create(@Assisted("taskId") String taskId,
+                            @Assisted("sql")    String sql,
+                            @Assisted("taskConfiguration")  String taskConfiguration)
+
+	AbstractTask create(String taskId, String sql)
+}
+
+public JDBCTask extends AbstractTask {
+	@AssistedInject
+	public JDBCTask( TemplateService template,
+			 @Assisted("taskid") taskId,
+			 @Assisted("sql") sql,
+			 @Assisted("taskConfiguration") taskConfiguration)
+
+	@AssistedInject
+	public JDBCTask( TemplateService template,
+			 @Assisted taskId,
+			 @Assisted sql)
+}
+
+
+in module: -
+
+bind(TemplateService.class).to(FreeMarkerTemplateService.class)
+install(new FactoryModuleBuilder()
+	.implement(AbstractTask.class,JDBCTask.class)
+	.build(JDBCTaskBuilder.class)
+

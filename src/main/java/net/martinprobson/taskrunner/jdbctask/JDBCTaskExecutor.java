@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.martinprobson.taskrunner.jdbctask;
 
 import com.github.dexecutor.core.task.Task;
@@ -10,8 +26,8 @@ import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -21,74 +37,59 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JDBCTaskExecutor extends TaskExecutor {
+/**
+ * <p>{@code JDBCTaskExecutor}</p>
+ *
+ * <p>Responsible for executing SQL via a JDBC connection.</p>
+ *
+ * @author martinr
+ */
+public class JDBCTaskExecutor implements TaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(JDBCTaskExecutor.class);
     private static StringSubstitutor substitutor;
 
     /**
-     * Given a String containing one or more jdbctask statements (separated by ';' character),
-     * split the statements and execute each one in turn.
      * <p>
+     * Given a String containing one or more SQL statements (separated by ';' character),
+     * split the statements and execute each one in turn against a JDBC connection supplied by a
+     * {@link DBSource}
+     * </p>
      *
-     * @param hqlStmts String containing jdbctask statement(s) to be run.
-     * @return returns <code>true</code> if jdbctask file successfully executed, <code>false</code> otherwise.
+     * @param sqlStmts String containing SQL statement(s) to be run.
+     * @throws TaskRunnerException on execution error.
      */
-    private static boolean ExecuteHqlStmts(String hqlStmts, Map<String, String> params) throws TaskRunnerException {
+    private static void ExecuteSqlStmts(String sqlStmts, Map<String, String> params) throws TaskRunnerException {
         if (params != null && params.size() != 0) {
             substitutor = new StringSubstitutor(params);
         }
-        Connection conn = null;
-        boolean rc = true;
 
-        try {
-            conn = DBSource.setupDataSource().getConnection();
+        try (Connection conn = DBSource.get().getConnection()) {
+            //@TODO Worth adding batch processing?
+            boolean batchSupported = conn.getMetaData().supportsBatchUpdates();
+            log.trace("DatabaseMetaData supportsBatchUpdates() = " + batchSupported);
             int i = 0;
-            List<String> stmts = HQLSplit(hqlStmts);
-            log.trace("String contains a string" + stmts.size() + " statements");
+            List<String> stmts = SQLSplit(sqlStmts);
+            log.trace("String contains  " + stmts.size() + " statement(s)");
             for (String stmt : stmts) {
                 log.trace("About to execute statment no: " + ++i);
                 log.trace("Statement before substitution: " + stmt);
                 stmt = replaceParams(stmt);
                 log.trace("Statement after substitution: " + stmt);
-                if (!ExecHQL(conn, stmt)) {
-                    log.error("Statement number: " + i);
-                    log.error("HQL statement: " + stmt + " failed");
-                    log.trace("Skipping rest of String");
-                    rc = false;
-                    break;
-                } else {
-                    log.trace("Statement number: " + i + " success");
-                }
+                ExecSQL(conn,stmt);
             }
         } catch (SQLException e) {
-            log.error("SQLException:");
-            while (e != null) {
-                log.error("SQLException:", e);
-                log.error("SQLState: " + e.getSQLState());
-                log.error("Message: " + e.getMessage());
-                log.error("Vendor: " + e.getErrorCode());
-                e = e.getNextException();
-            }
-            throw new TaskRunnerException("SQLException");
-        } finally {
-            try {
-                if (conn != null) conn.close();
-            } catch (Exception e) {
-                log.error("Error on conn close", e);
-                throw new TaskRunnerException("Error on conn close");
-            }
+            throw new TaskRunnerException("SQLException", e);
         }
-        return rc;
     }
 
     /**
-     * Split a string into separate HQL statements.
+     * Split a string into separate SQL statements.
      *
-     * @param hql - String containing HQL
-     * @return a list of HQL statements
+     * @param sql - String containing SQL
+     * @return a list of SQL statements
      */
-    private static List<String> HQLSplit(String hql) {
-        String str = stripComments(hql);
+    private static List<String> SQLSplit(String sql) {
+        String str = stripComments(sql);
         List<String> stmts = new ArrayList<>();
         boolean in_sQuote = false, in_dQuote = false;
         StringBuilder stmt = new StringBuilder();
@@ -115,9 +116,7 @@ public class JDBCTaskExecutor extends TaskExecutor {
         Pattern p = Pattern.compile("--");
         for (String s : str.split(System.getProperty("line.separator"))) {
             Matcher m = p.matcher(s);
-            if (m.find()) {
-                s = s.substring(0, m.start());
-            }
+            if (m.find()) s = s.substring(0, m.start());
             if (s.isEmpty()) continue;
             result.append(s).append(" ");
         }
@@ -125,68 +124,52 @@ public class JDBCTaskExecutor extends TaskExecutor {
     }
 
     private static String replaceParams(String line) {
-        if (substitutor == null) {
-            return line;
-        }
-        return substitutor.replace(line);
+        return (substitutor == null) ? line : substitutor.replace(line);
     }
 
     /**
-     * Execute single HQL statement.
-     * <p>
+     * Execute single SQL statement.
+     * <p></p>
      *
-     * @param conn    - DB Connection to run against.
-     * @param hqlStmt - HQL statement to execute.
-     * @return returns <code>true</code> if jdbctask file successfully executed, <code>false</code> otherwise.
+     * @param conn    - JDBC DB Connection to run against.
+     * @param sqlStmt - SQL statement to execute.
+     * @throws SQLException If the statement caused an error.
      */
-    private static boolean ExecHQL(Connection conn, String hqlStmt) {
+    private static void ExecSQL(Connection conn, String sqlStmt) throws SQLException {
 
-        boolean rc = true;
         Kerberos.auth();
-        log.trace("passed statement: " + hqlStmt);
-        Statement stmt = null;
-        try {
-            if (conn == null) {
-                DataSource dataSource = DBSource.setupDataSource();
-                conn = dataSource.getConnection();
+        log.trace("passed statement: " + sqlStmt);
+        try (Statement stmt = conn.createStatement()) {
+            log.debug("About to execute statement: " + sqlStmt);
+            ResultSet rs;
+            int updateCount;
+            //@TODO Fix
+            if (stmt.execute(sqlStmt)) {
+                rs = stmt.getResultSet();
+                log.debug("Resultset returned " + rs);
+            } else {
+                updateCount = stmt.getUpdateCount();
+                log.debug("Update count returned " + updateCount);
             }
-            stmt = conn.createStatement();
-            log.debug("About to execute statement: " + hqlStmt);
-            stmt.execute(hqlStmt);
-
-        } catch (SQLException e) {
-            log.error("SQLException:");
-            while (e != null) {
-                log.error("SQLException:", e);
-                log.error("SQLState: " + e.getSQLState());
-                log.error("Message: " + e.getMessage());
-                log.error("Vendor: " + e.getErrorCode());
-                e = e.getNextException();
-            }
-            rc = false;
-
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-            } catch (Exception e) {
-                log.error("Error on stmt close");
-                rc = false;
-            }
-
         }
-        return rc;
     }
 
+    /**
+     * Executes the SQL in a {@code JDBCTask}. The results of the execution are set on the {@code TaskResult} object within the
+     * JDBCTask itself.
+     *
+     * @param task The task to execute.
+     * @throws TaskRunnerException on execution error.
+     */
     @Override
-    public TaskResult executeTask(Task task) throws TaskRunnerException {
-        JDBCTask JDBCTask = (JDBCTask) task;
-        TaskResult.Result r;
-        boolean rc = ExecuteHqlStmts(JDBCTask.getHql(), Collections.emptyMap());
-        if (rc)
-            r = TaskResult.Result.SUCCESS;
-        else
-            r = TaskResult.Result.FAILURE;
-        return new TaskResult(r);
+    public void executeTask(Task task) throws TaskRunnerException {
+        JDBCTask jdbcTask = (JDBCTask) task;
+        try {
+            ExecuteSqlStmts(jdbcTask.getSql(), Collections.emptyMap());
+        } catch (TaskRunnerException e) {
+            jdbcTask.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
+            throw e;
+        }
+        jdbcTask.setTaskResult(new TaskResult(TaskResult.Result.SUCCESS));
     }
-
 }

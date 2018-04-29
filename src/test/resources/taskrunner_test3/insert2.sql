@@ -1,0 +1,1 @@
+INSERT INTO test3 VALUES (22,22);

@@ -1,62 +1,31 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.martinprobson.taskrunner;
-
-import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
-import org.apache.commons.configuration2.ImmutableConfiguration;
 
 import java.util.Map;
 
 /**
- * A TaskBuilder can construct a Map of Configured tasks
- * from the resource pointed to by {@link Resource}.
- * <p>It is up to implementing classes to determine the
- * meaning of <code>Resource</code>.</p> <p>It could be a directory
- * on the local filesystem, or a name of a database schema/table, or
- * a URL pointing to a resource on the classpath for example.
- * </p>
+ * A TaskBuilder can construct a Map of tasks
+ *
+ * @author martinr
  */
-abstract class TaskBuilder {
+public interface TaskBuilder {
 
-    public TaskBuilder() {
-        this(null);
-    }
+    Map<String, DependentTask> build() throws TaskRunnerException;
 
-    public TaskBuilder(Resource resource) {
-    }
-
-    /**
-     * Return the configuration used by this object.
-     */
-    protected ImmutableConfiguration getConf() {
-        return ConfigurationService.getConfiguration();
-    }
-
-    abstract Map<String, DependentTask> build();
-
-    static class Resource {
-        private final Object resource;
-        private final String name;
-
-        public Resource(Object resource) {
-            this(resource, resource.toString());
-        }
-
-        public Resource(Object resource, String name) {
-            this.resource = resource;
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Object getResource() {
-            return resource;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
 }

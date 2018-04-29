@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <configuration>
+    <test2>
+        bar
+    </test2>
+    <test3>
+        bar
+    </test3>
 </configuration>
+ 
 

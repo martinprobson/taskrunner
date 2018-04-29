@@ -4,16 +4,16 @@ import com.github.dexecutor.core.DexecutorConfig;
 
 import java.util.concurrent.ExecutorService;
 
-class TaskRunnerConfig extends DexecutorConfig<String, TaskResult> {
+public class TaskRunnerConfig extends DexecutorConfig<String, TaskResult> {
 
     private final TaskGroup taskGroup;
 
-    TaskRunnerConfig(final ExecutorService executorService, final TaskGroup taskGroup) {
+    public TaskRunnerConfig(final ExecutorService executorService, final TaskGroup taskGroup) {
         super(executorService, taskGroup);
         this.taskGroup = taskGroup;
     }
 
-    TaskGroup getTaskGroup() {
+    public TaskGroup getTaskGroup() {
         return taskGroup;
     }
 }
