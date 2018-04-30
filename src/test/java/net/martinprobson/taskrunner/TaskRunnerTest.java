@@ -99,7 +99,7 @@ public class TaskRunnerTest {
         TaskRunnerConfig config = null;
         try {
             config = new TaskRunnerConfig(executorService,
-                                  new TaskGroup(new LocalFileSystemBuilder(testDir)));
+                                  new TaskGroup(LocalFileSystemTaskBuilder.create(testDir)));
 
             TaskRunner taskRunner = new TaskRunner(config);
             taskRunner.execute(ExecutionConfig.NON_TERMINATING);
@@ -108,10 +108,11 @@ public class TaskRunnerTest {
         }
         // Check expected results against actual task results.
         //
-        for (DependentTask task: config.getTaskGroup()) {
+        for (BaseTask task: config.getTaskGroup()) {
             TaskResult.Result expected = expectedResults.get(task.getId()).getExpResult();
             TaskResult.Result actual   = task.getTaskResult().getResult();
-            assertEquals(expected,actual);
+            assertEquals("Task: " + task.getId() + " expected: " + expected + " actual: " + actual,
+                    expected,actual);
         }
     }
 }

@@ -20,7 +20,7 @@ public class Main {
 
     public static void main(String args[]) {
         // Configure our global configuration service.
-        ConfigurationService.load(new ConfigurationService(new TaskRunnerConfigurationProvider("global_config.xml", "user_password.xml")));
+//        ConfigurationService.load(new ConfigurationService(new TaskRunnerConfigurationProvider("global_config.xml", "user_password.xml")));
         ImmutableConfiguration conf = ConfigurationService.getConfiguration();
         println(conf.getString("jdbc.username"));
 /*

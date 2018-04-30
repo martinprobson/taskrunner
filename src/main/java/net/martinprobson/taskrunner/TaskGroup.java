@@ -31,8 +31,9 @@ import java.util.Map;
  *
  * @author martinr
  */
-public class TaskGroup implements Iterable<DependentTask>, TaskProvider<String, TaskResult> {
-    private final Map<String, DependentTask> tasks;
+public class TaskGroup implements Iterable<BaseTask>, TaskProvider<String, TaskResult> {
+
+    private final Map<String, BaseTask> tasks;
 
     /**
      * Construct a new TaskGroup with the passed TaskBuilder.
@@ -62,7 +63,7 @@ public class TaskGroup implements Iterable<DependentTask>, TaskProvider<String, 
     }
 
     @Override
-    public Iterator<DependentTask> iterator() {
+    public Iterator<BaseTask> iterator() {
         return tasks.values().iterator();
     }
 

@@ -16,34 +16,48 @@
  */
 package net.martinprobson.taskrunner;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.name.Named;
+import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.TemplateService;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@code DummyTask} A task that always returns SUCCESS when executed.
+ * A {@code DummyTask} A task with no content that always returns SUCCESS when executed.
  *
  * @author martinr
  */
-public class DummyTask extends DependentTask {
+public class DummyTask extends BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(DummyTask.class);
 
     /**
      * Construct a new DummyTask with the given id.
-     * @param id Taskid
+     * @param taskId Taskid to be created.
      */
-    public DummyTask(String id) {
-        super(id,"DUMMY");
+    @AssistedInject
+    private DummyTask(TemplateService templateService,
+                     @Named("dummy") TaskExecutor taskExecutor,
+                     @Assisted("taskid") String taskId,
+                     @Assisted Configuration taskConfiguration) {
+        super(taskId,"",taskConfiguration,templateService,taskExecutor);
+        log.trace("Built a new DummyTask with id: " + taskId);
     }
 
     /**
-     * Construct a new DummyTask with the given id and task specific configuration.
-     * @param id Taskid
-     * @param taskConfiguration Task specific configuration (XML file).
+     * Construct a new DummyTask with the given id.
+     * @param taskId Taskid to be created.
      */
-    public DummyTask(String id, String taskConfiguration) {
-        super(id,"DUMMY",taskConfiguration);
+    @AssistedInject
+    private DummyTask(TemplateService templateService,
+                      @Named("dummy") TaskExecutor taskExecutor,
+                      @Assisted("taskid") String taskId) {
+        super(taskId,"",templateService,taskExecutor);
+        log.trace("Built a new DummyTask with id: " + taskId);
     }
+
 
     /**
      * Execute the DummyTask - this always returns SUCCESS.

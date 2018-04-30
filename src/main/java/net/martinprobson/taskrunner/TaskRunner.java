@@ -32,7 +32,7 @@ public class TaskRunner extends DefaultDexecutor<String, TaskResult> {
     }
 
     private void setDependencies() throws TaskRunnerException {
-        for (DependentTask task : config.getTaskGroup()) {
+        for (BaseTask task : config.getTaskGroup()) {
             for (String dep : task.getDependencies()) {
                 if (config.getTaskGroup().hasId(dep)) {
                     if (task.getId().equals(dep))

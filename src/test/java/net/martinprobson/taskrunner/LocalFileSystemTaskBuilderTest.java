@@ -1,10 +1,13 @@
 package net.martinprobson.taskrunner;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
-import net.martinprobson.taskrunner.jdbctask.JDBCTask;
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,7 +22,9 @@ import static org.junit.Assert.assertEquals;
 
 public class LocalFileSystemTaskBuilderTest {
 
-    private static Map<String,DependentTask> expectedResults = new HashMap<>();
+    private static Map<String,BaseTask> expectedResults = new HashMap<>();
+    private static TaskFactory taskFactory;
+    private static Injector injector;
 
     /**
      * Given a filename of the form <code>hqlfile.hql</code>,
@@ -42,6 +47,12 @@ public class LocalFileSystemTaskBuilderTest {
             return null;
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        injector = Guice.createInjector(new TaskRunnerModule());
+        taskFactory = injector.getInstance(TaskFactory.class);
+    }
+
     private void setUp() throws Exception {
         ConfigurationService.load(new ConfigurationService(new TaskRunnerConfigurationProvider("test_global_config.xml")));
         ClassLoader classLoader = getClass().getClassLoader();
@@ -52,9 +63,10 @@ public class LocalFileSystemTaskBuilderTest {
             String contents = FileUtils.readFileToString(file,Charset.defaultCharset());
             String configFile = getConfigFile(testDirectory,sqlFile);
             if (configFile == null)
-                expectedResults.put(sqlFile,new JDBCTask(sqlFile,contents));
+                //@TODO Fix
+                expectedResults.put(sqlFile,taskFactory.createJDBCTask(sqlFile,contents,new CombinedConfiguration()));
             else
-                expectedResults.put(sqlFile,new JDBCTask(sqlFile,contents,configFile));
+                expectedResults.put(sqlFile, taskFactory.createJDBCTask(sqlFile,contents,TaskBuilder.getConfig(configFile)));
         };
     }
 
@@ -63,8 +75,8 @@ public class LocalFileSystemTaskBuilderTest {
         setUp();
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("taskrunner_test1").getFile());
-        LocalFileSystemBuilder builder = new LocalFileSystemBuilder(file.getAbsolutePath());
-        Map<String,DependentTask> tasks = builder.build();
+        LocalFileSystemTaskBuilder builder = LocalFileSystemTaskBuilder.create(file.getAbsolutePath());
+        Map<String,BaseTask> tasks = builder.build();
         assertEquals(expectedResults,tasks);
     }
 
@@ -74,9 +86,7 @@ public class LocalFileSystemTaskBuilderTest {
     @Test
     public void testInvalidDir() throws TaskRunnerException {
         thrown.expect(TaskRunnerException.class);
-        thrown.expectMessage(startsWith("LocalFileSystemBuilder: directory foo"));
-
-        new LocalFileSystemBuilder("foo");
-
+        thrown.expectMessage(startsWith("LocalFileSystemTaskBuilder: directory foo"));
+        LocalFileSystemTaskBuilder.create("foo");
     }
 }

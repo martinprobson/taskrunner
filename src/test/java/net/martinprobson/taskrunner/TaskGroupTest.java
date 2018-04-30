@@ -1,7 +1,10 @@
 package net.martinprobson.taskrunner;
 
 import com.github.dexecutor.core.task.Task;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -13,20 +16,24 @@ import static org.junit.Assert.*;
 public class TaskGroupTest {
 
     private static TaskGroup taskGroup;
-    private static Map<String,DependentTask> expectedTasks;
+    private static Map<String,BaseTask> expectedTasks;
+    private static TaskFactory taskFactory;
 
-    private static Map<String,DependentTask> getTasks() {
-        HashMap<String, DependentTask> tasks = new HashMap<>();
+    private static Map<String,BaseTask> getTasks() {
+        HashMap<String, BaseTask> tasks = new HashMap<>();
         String taskNames[] = {"t1", "t2", "t3", "t4","t5","t6","t7"};
         for (String task : taskNames)
-            tasks.put(task,new DummyTask(task));
+            //@TODO Fix
+            tasks.put(task,taskFactory.createDummyTask(task,new CombinedConfiguration()));
         return tasks;
     }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        ConfigurationService.load(new ConfigurationService(new TaskRunnerConfigurationProvider("test_global_config.xml")));
-        taskGroup = new TaskGroup( () -> getTasks());
+//        ConfigurationService.load(new ConfigurationService(new TaskRunnerConfigurationProvider("test_global_config.xml")));
+        Injector injector = Guice.createInjector(new TaskRunnerModule());
+        taskFactory = injector.getInstance(TaskFactory.class);
+        taskGroup = new TaskGroup( () -> getTasks() );
         expectedTasks = getTasks();
     }
 

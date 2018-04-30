@@ -16,7 +16,11 @@
  */
 package net.martinprobson.taskrunner;
 
-import net.martinprobson.taskrunner.jdbctask.JDBCTask;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.assistedinject.Assisted;
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -28,14 +32,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@code LocalFileSystemBuilder} - Build a Collection of tasks from the specified
+ * {@code LocalFileSystemTaskBuilder} - Build a Collection of tasks from the specified
  * base directory on the local file system.
  *
  * @author martinr
  */
-public class LocalFileSystemBuilder implements TaskBuilder {
+public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
+    private static Injector injector = null;
     private String baseDirectory;
+    private TaskFactory taskFactory;
+
+    public static LocalFileSystemTaskBuilder create(String baseDirectory) throws TaskRunnerException {
+        if (injector == null) injector = Guice.createInjector(new TaskRunnerModule());
+        LocalFileSystemTaskBuilderFactory factory = injector.getInstance(LocalFileSystemTaskBuilderFactory.class);
+        File f = new File(baseDirectory);
+        if (f.exists() && f.isDirectory())
+            baseDirectory = f.getAbsolutePath();
+        else
+            throw new TaskRunnerException("LocalFileSystemTaskBuilder: directory " + baseDirectory + " does not exist");
+        return factory.create(baseDirectory);
+    }
+
+    @Inject
+    private LocalFileSystemTaskBuilder(TaskFactory taskFactory,
+                                       @Assisted String baseDirectory) {
+        this.taskFactory = taskFactory;
+        this.baseDirectory = baseDirectory;
+    }
 
     /**
      * Given a filename of the form <code>file.sql</code>,
@@ -59,27 +83,14 @@ public class LocalFileSystemBuilder implements TaskBuilder {
     }
 
     /**
-     * Constructs a new LocalFileSystemBuilder with give base directory.
      *
-     * @param baseDirectory
-     * @throws TaskRunnerException
-     */
-    public LocalFileSystemBuilder(String baseDirectory) throws TaskRunnerException {
-        File f = new File(baseDirectory);
-        if (f.exists() && f.isDirectory())
-            this.baseDirectory = f.getAbsolutePath();
-        else
-            throw new TaskRunnerException("LocalFileSystemBuilder: directory " + baseDirectory + " does not exist");
-    }
-
-    /**
-     *
-     * @return A collection of Tasks built from specifically base directory.
+     * @return A collection of Tasks built from specific base directory.
      * @throws TaskRunnerException
      */
     @Override
-    public Map<String, DependentTask> build() throws TaskRunnerException {
-        Map<String, DependentTask> taskMap = new HashMap<>();
+    public Map<String, BaseTask> build() throws TaskRunnerException {
+
+        Map<String, BaseTask> taskMap = new HashMap<>();
         File testDirectory = new File(baseDirectory);
         String[] sqlFiles = testDirectory.list(new SuffixFileFilter(".sql"));
         if (sqlFiles != null)
@@ -93,9 +104,10 @@ public class LocalFileSystemBuilder implements TaskBuilder {
                 }
                 String configFile = getConfigFile(testDirectory, sqlFile);
                 if (configFile == null)
-                    taskMap.put(sqlFile, new JDBCTask(sqlFile, contents));
+                    //@TODO Fix
+                    taskMap.put(sqlFile,taskFactory.createJDBCTask(sqlFile,contents,new CombinedConfiguration()));
                 else
-                    taskMap.put(sqlFile, new JDBCTask(sqlFile, contents, configFile));
+                    taskMap.put(sqlFile, taskFactory.createJDBCTask(sqlFile,contents,TaskBuilder.getConfig(configFile)));
             }
 
         return taskMap;

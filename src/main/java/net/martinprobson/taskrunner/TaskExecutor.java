@@ -24,6 +24,5 @@ import com.github.dexecutor.core.task.Task;
  * @author martinr
  */
 public interface TaskExecutor {
-    void executeTask(Task task) throws TaskRunnerException;
-
+    void executeTask(BaseTask task) throws TaskRunnerException;
 }

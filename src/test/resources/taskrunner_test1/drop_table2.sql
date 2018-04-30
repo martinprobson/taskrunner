@@ -1,1 +1,2 @@
-DROP TABLE IF EXISTS test2;
+-- This is a synatx error
+DRP TABLE test2;

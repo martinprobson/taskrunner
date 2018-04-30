@@ -17,6 +17,7 @@
 package net.martinprobson.taskrunner.jdbctask;
 
 import com.github.dexecutor.core.task.Task;
+import net.martinprobson.taskrunner.BaseTask;
 import net.martinprobson.taskrunner.TaskExecutor;
 import net.martinprobson.taskrunner.TaskResult;
 import net.martinprobson.taskrunner.TaskRunnerException;
@@ -162,7 +163,7 @@ public class JDBCTaskExecutor implements TaskExecutor {
      * @throws TaskRunnerException on execution error.
      */
     @Override
-    public void executeTask(Task task) throws TaskRunnerException {
+    public void executeTask(BaseTask task) throws TaskRunnerException {
         JDBCTask jdbcTask = (JDBCTask) task;
         try {
             ExecuteSqlStmts(jdbcTask.getSql(), Collections.emptyMap());

@@ -17,11 +17,12 @@
 
 package net.martinprobson.taskrunner.jdbctask;
 
-import com.github.dexecutor.core.task.TaskExecutionException;
-import net.martinprobson.taskrunner.DependentTask;
-import net.martinprobson.taskrunner.TaskExecutor;
-import net.martinprobson.taskrunner.TaskResult;
-import net.martinprobson.taskrunner.TaskRunnerException;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.name.Named;
+import net.martinprobson.taskrunner.*;
+import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.TemplateService;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martinr
  */
-public class JDBCTask extends DependentTask {
+public class JDBCTask extends BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(JDBCTask.class);
     private static TaskExecutor taskExecutor = null;
@@ -42,30 +43,35 @@ public class JDBCTask extends DependentTask {
      * Creates a JDBCTask with the specified id,sql and task configuration.
      *
      * @param taskId             Task Id
-     * @param sql                Sql contents
+     * @param content            Sql contents
      * @param taskConfiguration  Task specification configuration XML filename.
      */
-    public JDBCTask(String taskId, String sql, String taskConfiguration) {
-        super(taskId, sql, taskConfiguration);
+    @AssistedInject
+    private JDBCTask(TemplateService templateService,
+                     @Named("jdbc") TaskExecutor jdbcTaskExecutor,
+                     @Assisted("taskid") String taskId,
+                     @Assisted("content") String content,
+                     @Assisted Configuration taskConfiguration) {
+        super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
+        log.trace("Built a new JDBCTask with id: " + taskId);
     }
 
     /**
-     * Creates a JDBCTask with the specified id and sql contents.
      *
-     * @param taskId  Task id
-     * @param sql     Sql contents
+     * Creates a JDBCTask with the specified id,sql and task configuration.
      *
+     * @param taskId             Task Id
+     * @param content            Sql contents
      */
-    public JDBCTask(String taskId, String sql) {
-        super(taskId, sql);
+    @AssistedInject
+    private JDBCTask(TemplateService templateService,
+                     @Named("jdbc") TaskExecutor jdbcTaskExecutor,
+                     @Assisted("taskid") String taskId,
+                     @Assisted("content") String content) {
+        super(taskId,content,templateService,jdbcTaskExecutor);
+        log.trace("Built a new JDBCTask with id: " + taskId);
     }
 
-
-    private static TaskExecutor getTaskExecutor() {
-        if (taskExecutor == null)
-            taskExecutor = new JDBCTaskExecutor();
-        return taskExecutor;
-    }
 
     /**
      * @return The sql that this task holds.
@@ -74,26 +80,4 @@ public class JDBCTask extends DependentTask {
         return getTask();
     }
 
-    /**
-     * <p>{@code execute}</p>
-     *
-     * <p>Executes the SQL via JDBC.</p>
-     *
-     * @return set to {@code SUCCESSFUL} if execution successful, {@code FAILED} if error occurs.
-     * @throws TaskExecutionException thrown when a execution problem is encountered.
-     */
-    public TaskResult execute() throws TaskExecutionException {
-        log.trace("About to execute task id: " + this.getId());
-        try {
-            getTaskExecutor().executeTask(this);
-        } catch (TaskRunnerException e) {
-            setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
-            throw new TaskExecutionException("Task: " + getId() + " failed with " + e.getMessage(),e);
-        }
-        if (getTaskResult().failed())
-            log.error("Task: " + this.getId() + " Result: " + getTaskResult());
-        else
-            log.trace("Task: " + this.getId() + " Result: " + getTaskResult());
-        return getTaskResult();
-    }
 }
