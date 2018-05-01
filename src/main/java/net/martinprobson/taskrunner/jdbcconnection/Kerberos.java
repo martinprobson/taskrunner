@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.martinprobson.taskrunner.taskrunner.jdbcconnection;
+package net.martinprobson.taskrunner.jdbcconnection;
 
 import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
 import org.apache.commons.configuration2.ImmutableConfiguration;

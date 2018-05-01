@@ -1,6 +1,5 @@
-package net.martinprobson.main;
+package net.martinprobson.taskrunner.main;
 
-import com.github.dexecutor.core.DexecutorState;
 import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.taskrunner.*;
 import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
@@ -22,7 +21,7 @@ public class Main {
         TaskRunnerConfig config = null;
         String testDir = new File(Objects.requireNonNull(Main.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
         /* 2. Setup an executor service. */
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(200);
 //        ExecutorService executorService = Executors.newFixedThreadPool(1);
 
         try {

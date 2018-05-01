@@ -21,7 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
 import net.martinprobson.taskrunner.*;
-import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.TemplateService;
+import net.martinprobson.taskrunner.template.TemplateService;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

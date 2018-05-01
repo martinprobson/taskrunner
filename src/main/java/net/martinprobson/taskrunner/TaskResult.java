@@ -99,7 +99,7 @@ public class TaskResult {
     }
 
     public enum Result {
-        SUCCESS, FAILED, NOT_EXECUTED
+        SUCCESS, RUNNING, FAILED, NOT_EXECUTED
     }
 
 }

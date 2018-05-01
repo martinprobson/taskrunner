@@ -16,13 +16,12 @@
  */
 package net.martinprobson.taskrunner.jdbctask;
 
-import com.github.dexecutor.core.task.Task;
 import net.martinprobson.taskrunner.BaseTask;
 import net.martinprobson.taskrunner.TaskExecutor;
 import net.martinprobson.taskrunner.TaskResult;
 import net.martinprobson.taskrunner.TaskRunnerException;
-import net.martinprobson.taskrunner.taskrunner.jdbcconnection.DBSource;
-import net.martinprobson.taskrunner.taskrunner.jdbcconnection.Kerberos;
+import net.martinprobson.taskrunner.jdbcconnection.DBSource;
+import net.martinprobson.taskrunner.jdbcconnection.Kerberos;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

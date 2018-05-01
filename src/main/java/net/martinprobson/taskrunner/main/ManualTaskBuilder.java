@@ -1,4 +1,4 @@
-package net.martinprobson.main;
+package net.martinprobson.taskrunner.main;
 
 import com.google.inject.Inject;
 import net.martinprobson.taskrunner.BaseTask;

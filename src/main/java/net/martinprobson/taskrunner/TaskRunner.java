@@ -17,6 +17,9 @@
 package net.martinprobson.taskrunner;
 
 import com.github.dexecutor.core.DefaultDexecutor;
+import com.github.dexecutor.core.ExecutionConfig;
+import com.github.dexecutor.core.task.ExecutionResults;
+import net.martinprobson.taskrunner.monitor.SimpleMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +33,16 @@ public class TaskRunner extends DefaultDexecutor<String, TaskResult> {
         this.config = config;
         setDependencies();
     }
+
+    @Override
+    public ExecutionResults<String, TaskResult> execute(final ExecutionConfig ExecutionConfig) {
+        SimpleMonitor monitor = SimpleMonitor.getInstance(config.getTaskGroup());
+        monitor.start();
+        ExecutionResults<String,TaskResult> results = super.execute(ExecutionConfig);
+        monitor.stop();
+        return results;
+    }
+
 
     private void setDependencies() throws TaskRunnerException {
         for (BaseTask task : config.getTaskGroup()) {

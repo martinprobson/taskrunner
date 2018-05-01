@@ -5,8 +5,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import net.martinprobson.taskrunner.jdbctask.JDBCTask;
 import net.martinprobson.taskrunner.jdbctask.JDBCTaskExecutor;
-import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.DummyTemplateService;
-import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.TemplateService;
+import net.martinprobson.taskrunner.template.DummyTemplateService;
+import net.martinprobson.taskrunner.template.TemplateService;
 
 /**
  * <h3>{@code TaskRunnerModule}</h3>

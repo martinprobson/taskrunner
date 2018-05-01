@@ -70,8 +70,12 @@ public class TaskGroup implements Iterable<BaseTask>, TaskProvider<String, TaskR
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Task task : this) {
-            sb.append("id: ").append(task.getId()).append("\n");
+        for (BaseTask task : this) {
+            sb.append("id: [")
+                    .append(task.getId())
+                    .append("] Task Status: [")
+                    .append(task.getTaskResult().getResult())
+                    .append("]\n");
         }
         return sb.toString();
     }

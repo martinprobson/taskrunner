@@ -1,4 +1,4 @@
-package net.martinprobson.taskrunner.taskrunner.jdbcconnection;
+package net.martinprobson.taskrunner.jdbcconnection;
 
 /**
  * Interface to allow extra parameters to be added to JDBC connection string.

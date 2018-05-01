@@ -1,4 +1,4 @@
-package net.martinprobson.taskrunner.net.martinprobson.taskrunner.template;
+package net.martinprobson.taskrunner.template;
 
 public class TemplateException extends Exception {
 

@@ -22,7 +22,7 @@ import com.github.dexecutor.core.task.ExecutionResults;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskExecutionException;
 import net.martinprobson.taskrunner.configurationservice.ConfigurationService;
-import net.martinprobson.taskrunner.net.martinprobson.taskrunner.template.TemplateService;
+import net.martinprobson.taskrunner.template.TemplateService;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
@@ -209,6 +209,8 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      */
     public TaskResult execute() throws TaskExecutionException {
         log.trace("About to execute task id: " + this.getId());
+        setTaskResult(new TaskResult(TaskResult.Result.RUNNING));
+        randomDelay(3,10);
         //@TODO Set status to running.....
         try {
             taskExecutor.executeTask(this);
@@ -260,5 +262,13 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      */
     private static final Logger log = LoggerFactory.getLogger(DummyTask.class);
 
-
+    private static void randomDelay(float min, float max){
+        int random = (int)(max * Math.random() + min);
+        try {
+            Thread.sleep(random * 1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

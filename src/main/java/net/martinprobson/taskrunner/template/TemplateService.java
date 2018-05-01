@@ -1,4 +1,4 @@
-package net.martinprobson.taskrunner.net.martinprobson.taskrunner.template;
+package net.martinprobson.taskrunner.template;
 
 
 import org.apache.commons.configuration2.Configuration;
