@@ -3,6 +3,7 @@ package net.martinprobson.jobrunner;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import net.martinprobson.jobrunner.jdbctask.JDBCTask;
+import net.martinprobson.jobrunner.sparkscalatask.SparkScalaTask;
 import org.apache.commons.configuration2.Configuration;
 
 /**
@@ -20,7 +21,7 @@ public interface TaskFactory {
      * @param taskConfiguration The task specific configuration for this task.
      * @return A DummyTask.
      */
-    @Named("dummy") DummyTask createDummyTask(@Assisted("taskid") String taskid,
+    @Named("dummy") BaseTask createDummyTask(@Assisted("taskid") String taskid,
                                               Configuration taskConfiguration);
 
     /**
@@ -29,7 +30,7 @@ public interface TaskFactory {
      * @param taskid The taskId to create.
      * @return A DummyTask.
      */
-    @Named("dummy") DummyTask createDummyTask(@Assisted("taskid") String taskid);
+    @Named("dummy") BaseTask createDummyTask(@Assisted("taskid") String taskid);
 
     /**
      * Construct a new {@link JDBCTask}.
@@ -40,7 +41,7 @@ public interface TaskFactory {
      * @return A JDBCTask.
      */
     @Named("jdbc")
-    JDBCTask createJDBCTask(@Assisted("taskid") String taskid,
+    BaseTask createJDBCTask(@Assisted("taskid") String taskid,
                             @Assisted("content") String content,
                             Configuration taskConfiguration);
 
@@ -52,7 +53,32 @@ public interface TaskFactory {
      * @return A JDBCTask.
      */
     @Named("jdbc")
-    JDBCTask createJDBCTask(@Assisted("taskid") String taskid,
+    BaseTask createJDBCTask(@Assisted("taskid") String taskid,
                             @Assisted("content") String content);
+
+    /**
+     * Construct a new {@link SparkScalaTask}.
+     * <p>A {@code SparkScalaTask} will execute a Spark Scala script against a Spark connection.</p>
+     * @param taskid The taskId to create.
+     * @param content The Scala script that will be executed by this Task.
+     * @param taskConfiguration The task specific configuration for this task.
+     * @return A SparkScalaTask.
+     */
+    @Named("spark-scala")
+    BaseTask createSparkScalaTask(@Assisted("taskid") String taskid,
+                                        @Assisted("content") String content,
+                                        Configuration taskConfiguration);
+
+    /**
+     * Construct a new {@link SparkScalaTask}.
+     * <p>A {@code SparkScalaTask} will execute a Spark Scala script against a Spark connection.</p>
+     * <p>A {@code SparkScalaTask} will execute SQL against a JDBC connection.</p>
+     * @param taskid The taskId to create.
+     * @param content The Scala script that will be executed by this Task.
+     * @return A SparkScalaTask.
+     */
+    @Named("spark-scala")
+    BaseTask createSparkScalaTask(@Assisted("taskid") String taskid,
+                                        @Assisted("content") String content);
 
 }

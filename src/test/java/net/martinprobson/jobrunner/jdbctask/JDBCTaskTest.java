@@ -25,20 +25,20 @@ public class JDBCTaskTest {
     }
 
     @Test
-    public void getSql() {
+    public void getTask() {
         String sql = "create table foo (bar varchar(1));";
-        JDBCTask jdbcTask = taskFactory.createJDBCTask("test",sql);
-        assert jdbcTask.getSql().equals(sql);
+        BaseTask jdbcTask = taskFactory.createJDBCTask("test",sql);
+        assert jdbcTask.getTask().equals(sql);
     }
 
     @Test
     public void TestExecuteSuccess() {
         String sql = "create table foo (bar varchar(1));";
-        JDBCTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSuccess 1",sql);
+        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSuccess 1",sql);
         TaskResult result = jdbcTask.execute();
         assertTrue(result.succeeded());
         String sql2 = "insert into foo values ('1'); insert into foo values ('2');drop table foo;";
-        JDBCTask jdbcTask2 = taskFactory.createJDBCTask("TestExecuteSuccess 2",sql2);
+        BaseTask jdbcTask2 = taskFactory.createJDBCTask("TestExecuteSuccess 2",sql2);
         TaskResult result2 = jdbcTask2.execute();
         assertTrue(result2.succeeded());
     }
@@ -46,7 +46,7 @@ public class JDBCTaskTest {
     @Test
     public void TestExecuteFailure() {
         String sql = "insert into bob values ('1');";
-        JDBCTask jdbcTask = taskFactory.createJDBCTask("TestExecuteFailure",sql);
+        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteFailure",sql);
         try {
             TaskResult result = jdbcTask.execute();
         } catch (TaskExecutionException e) {
@@ -64,7 +64,7 @@ public class JDBCTaskTest {
         sb.append("insert into bar values ('2');");
         sb.append("select * from bar;");
         sb.append("drop table bar;");
-        JDBCTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSelect 1",sb.toString());
+        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSelect 1",sb.toString());
         TaskResult result = jdbcTask.execute();
         assertTrue(result.succeeded());
     }

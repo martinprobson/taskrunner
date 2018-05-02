@@ -15,61 +15,62 @@
  * limitations under the License.
  */
 
-package net.martinprobson.jobrunner.jdbctask;
+package net.martinprobson.jobrunner.sparkscalatask;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
-import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.BaseTask;
+import net.martinprobson.jobrunner.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>{@code JDBCTask}</p>
+ * <p>{@code SparkScalaTask}</p>
  *
- * <p>A task that holds SQL that will be executed against a JDBC connection.</p>
+ * <p>A task that holds Spark Scala script code that will be executed in Spark via {@code Spark-shell}.</p>
  *
  * @author martinr
  */
-public class JDBCTask extends BaseTask {
+public class SparkScalaTask extends BaseTask {
 
-    private static final Logger log = LoggerFactory.getLogger(JDBCTask.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkScalaTask.class);
     private static TaskExecutor taskExecutor = null;
 
     /**
      *
-     * Creates a JDBCTask with the specified id,sql and task configuration.
+     * Creates a SparkScalaTask with the specified id,scala code and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Sql contents
+     * @param content            Spark Scala script code to run.
      * @param taskConfiguration  Task specification configuration XML filename.
      */
     @AssistedInject
-    private JDBCTask(TemplateService templateService,
-                     @Named("jdbc") TaskExecutor jdbcTaskExecutor,
-                     @Assisted("taskid") String taskId,
-                     @Assisted("content") String content,
-                     @Assisted Configuration taskConfiguration) {
+    private SparkScalaTask(TemplateService templateService,
+                           @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
+                           @Assisted("taskid")   String taskId,
+                           @Assisted("content")  String content,
+                           @Assisted Configuration taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new JDBCTask with id: " + taskId);
+        log.trace("Built a new SparkScalaTask with id: " + taskId);
     }
 
     /**
      *
-     * Creates a JDBCTask with the specified id,sql and task configuration.
+     * Creates a SparkScalaTask with the specified id,scala script content and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Sql contents
+     * @param content            Scala script (Spark) content
      */
     @AssistedInject
-    private JDBCTask(TemplateService templateService,
-                     @Named("jdbc") TaskExecutor jdbcTaskExecutor,
-                     @Assisted("taskid") String taskId,
-                     @Assisted("content") String content) {
+    private SparkScalaTask(TemplateService templateService,
+                           @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
+                           @Assisted("taskid")   String taskId,
+                           @Assisted("content")  String content) {
         super(taskId,content,templateService,jdbcTaskExecutor);
-        log.trace("Built a new JDBCTask with id: " + taskId);
+        log.trace("Built a new SparkScalaTask with id: " + taskId);
     }
 
 }

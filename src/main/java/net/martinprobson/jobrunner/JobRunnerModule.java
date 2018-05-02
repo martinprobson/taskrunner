@@ -5,6 +5,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import net.martinprobson.jobrunner.jdbctask.JDBCTask;
 import net.martinprobson.jobrunner.jdbctask.JDBCTaskExecutor;
+import net.martinprobson.jobrunner.sparkscalatask.SparkScalaTask;
+import net.martinprobson.jobrunner.sparkscalatask.SparkScalaTaskExecutor;
 import net.martinprobson.jobrunner.template.FreeMarkerTemplateService;
 import net.martinprobson.jobrunner.template.TemplateService;
 
@@ -21,9 +23,12 @@ public class JobRunnerModule extends AbstractModule {
         bind(TemplateService.class).to(FreeMarkerTemplateService.class);
         bind(TaskExecutor.class).annotatedWith(Names.named("dummy")).to(DummyTaskExecutor.class);
         bind(TaskExecutor.class).annotatedWith(Names.named("jdbc")).to(JDBCTaskExecutor.class);
+        bind(TaskExecutor.class).annotatedWith(Names.named("spark-scala")).to(SparkScalaTaskExecutor.class);
+
         install(new FactoryModuleBuilder()
                 .implement(BaseTask.class,Names.named("dummy"),DummyTask.class)
                 .implement(BaseTask.class,Names.named("jdbc"),JDBCTask.class)
+                .implement(BaseTask.class,Names.named("spark-scala"),SparkScalaTask.class)
                 .build(TaskFactory.class));
         install(new FactoryModuleBuilder().build(LocalFileSystemTaskBuilderFactory.class));
     }

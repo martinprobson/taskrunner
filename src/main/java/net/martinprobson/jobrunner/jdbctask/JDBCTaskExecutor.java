@@ -131,13 +131,12 @@ public class JDBCTaskExecutor implements TaskExecutor {
      */
     @Override
     public void executeTask(BaseTask task) throws JobRunnerException {
-        JDBCTask jdbcTask = (JDBCTask) task;
         try {
-            ExecuteSqlStmts(jdbcTask.getTemplatedTask());
+            ExecuteSqlStmts(task.getTemplatedTask());
         } catch (JobRunnerException e) {
-            jdbcTask.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
+            task.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
             throw e;
         }
-        jdbcTask.setTaskResult(new TaskResult(TaskResult.Result.SUCCESS));
+        task.setTaskResult(new TaskResult(TaskResult.Result.SUCCESS));
     }
 }
