@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<configuration>
+    <depends-on>
+    </depends-on>
+    <template>
+        <schema>default</schema>
+        <tablename>test7</tablename>
+    </template>
+</configuration>
+
