@@ -22,7 +22,7 @@ import static freemarker.template.Configuration.VERSION_2_3_28;
 public class FreeMarkerTemplateService implements TemplateService {
 
     private static final Logger log = LoggerFactory.getLogger(FreeMarkerTemplateService.class);
-    private static freemarker.template.Configuration freeMarkerConfig;
+    private static final freemarker.template.Configuration freeMarkerConfig;
 
     static {
         freeMarkerConfig = new freemarker.template.Configuration(VERSION_2_3_28);
@@ -37,7 +37,7 @@ public class FreeMarkerTemplateService implements TemplateService {
         String templatedContent;
         Configuration sub =  configuration.subset("template");
         Iterator<String> keys = sub.getKeys();
-        Map templateVars = new HashMap<>();
+        Map<String,String> templateVars = new HashMap<>();
         while (keys.hasNext()) {
             String key = keys.next();
             templateVars.put(key,sub.getString(key));
@@ -45,7 +45,7 @@ public class FreeMarkerTemplateService implements TemplateService {
         if (templateVars.isEmpty())
             templatedContent = content;
         else {
-            Template template = null;
+            Template template;
             try {
                 template = new Template(id, content, freeMarkerConfig);
                 StringWriter stringWriter = new StringWriter();

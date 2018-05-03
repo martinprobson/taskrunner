@@ -2,7 +2,7 @@ package net.martinprobson.jobrunner.monitor;
 
 import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import net.martinprobson.jobrunner.main.Main;
+import net.martinprobson.jobrunner.main.RunJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class SimpleMonitor {
 
     public static void main(String args[]) {
         ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("reference_config.xml")));
-        String testDir = new File(Objects.requireNonNull(Main.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
+        String testDir = new File(Objects.requireNonNull(RunJob.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
         try {
             Job job = new Job(LocalFileSystemTaskBuilder.create(testDir,testDir));
             SimpleMonitor monitor = SimpleMonitor.getInstance(job);

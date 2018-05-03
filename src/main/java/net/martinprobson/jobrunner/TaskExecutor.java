@@ -16,6 +16,8 @@
  */
 package net.martinprobson.jobrunner;
 
+import net.martinprobson.jobrunner.template.TemplateService;
+
 /**
  * A TaskExecutor can execute a passed Task.
  *

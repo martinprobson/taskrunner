@@ -1,9 +1,7 @@
 package net.martinprobson.jobrunner.main;
 
 import com.google.inject.Inject;
-import net.martinprobson.jobrunner.BaseTask;
-import net.martinprobson.jobrunner.TaskBuilder;
-import net.martinprobson.jobrunner.TaskFactory;
+import net.martinprobson.jobrunner.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,22 +13,15 @@ import java.util.Map;
  */
 class ManualTaskBuilder implements TaskBuilder {
 
-
-    private TaskFactory taskFactory;
-
-    @Inject
-    public ManualTaskBuilder(TaskFactory taskFactory) {
-        this.taskFactory = taskFactory;
-    }
-
-    public Map<String, BaseTask> build() {
+    public Map<String, BaseTask> build() throws JobRunnerException {
+        TaskProvider taskProvider = TaskProvider.getInstance();
         HashMap<String, BaseTask> tasks = new HashMap<>();
         String taskNames[] = {"drop_table1", "drop_table2", "create_table1", "create_table2",
                 "insert1", "insert2", "create_table3"};
         for (String task : taskNames) {
             BaseTask t;
             //@TODO FIx
-            t = taskFactory.createDummyTask(task + ".hql",TaskBuilder.getConfig(task + ".xml"));
+            t = taskProvider.createTask("dummy",task + ".hql","",TaskBuilder.getConfig(task + ".xml"));
             tasks.put(t.getId(), t);
         }
 

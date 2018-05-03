@@ -23,5 +23,5 @@ public interface TemplateService {
      * @return The content modified by the template.
      * @throws TemplateException if a field cannot be found or other template error occurs.
      */
-    public String apply(String id, String content, Configuration configuration) throws TemplateException;
+    String apply(String id, String content, Configuration configuration) throws TemplateException;
 }

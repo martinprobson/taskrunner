@@ -16,23 +16,14 @@
  */
 package net.martinprobson.jobrunner.sparkscalatask;
 
+import com.google.inject.Inject;
 import net.martinprobson.jobrunner.BaseTask;
 import net.martinprobson.jobrunner.JobRunnerException;
 import net.martinprobson.jobrunner.TaskExecutor;
 import net.martinprobson.jobrunner.TaskResult;
-import net.martinprobson.jobrunner.jdbcconnection.DBSource;
-import net.martinprobson.jobrunner.jdbcconnection.Kerberos;
-import net.martinprobson.jobrunner.jdbctask.JDBCTask;
+import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <p>{@code SparkScalaTaskExecutor}</p>
@@ -43,7 +34,6 @@ import java.util.regex.Pattern;
  */
 public class SparkScalaTaskExecutor implements TaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(SparkScalaTaskExecutor.class);
-
 
     /**
      * Executes the Scala code in a {@code SparkScalaTask}.
@@ -56,7 +46,7 @@ public class SparkScalaTaskExecutor implements TaskExecutor {
     @Override
     public void executeTask(BaseTask task) throws JobRunnerException {
         try {
-            execute(task.getTemplatedTask());
+            execute(task.getTemplatedTaskContents());
         } catch (JobRunnerException e) {
             task.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
             throw e;

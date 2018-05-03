@@ -22,6 +22,7 @@ import com.github.dexecutor.core.task.ExecutionResults;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskExecutionException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
+import net.martinprobson.jobrunner.dummytask.DummyTask;
 import net.martinprobson.jobrunner.template.TemplateException;
 import net.martinprobson.jobrunner.template.TemplateService;
 import org.apache.commons.configuration2.CombinedConfiguration;
@@ -29,6 +30,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -111,9 +113,9 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
-    protected BaseTask(String id, String task, Configuration taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
+    protected BaseTask(String id, String task, @Nullable Configuration taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
         this(id,task,templateService,taskExecutor);
-        this.configuration.addConfiguration(taskConfig, "task");
+        if (taskConfig != null) this.configuration.addConfiguration(taskConfig, "task");
     }
 
     /**
@@ -132,7 +134,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
 
     @Override
     public String toString() {
-        return "BaseTask{id = " + taskId +
+        return  getClass().getName() + "{id = " + taskId +
                 ",task='" + task + '\'' +
                 ",result=" + result + "}";
     }
@@ -148,16 +150,16 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * @return the task contents.
      */
-    public String getTask() {
+    public String getTaskContents() {
         return task;
     }
 
     /**
      * @return the task contents after template has been applied
      */
-    public String getTemplatedTask() throws JobRunnerException {
+    public String getTemplatedTaskContents() throws JobRunnerException {
         try {
-            return templateService.apply(getId(),getTask(),getConfiguration());
+            return templateService.apply(getId(), getTaskContents(),getConfiguration());
         } catch (TemplateException e) {
             throw new JobRunnerException("Template error",e);
         }
@@ -258,7 +260,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         }
         BaseTask o = (BaseTask) other;
         return Objects.equals(taskId, o.getId()) &&
-                Objects.equals(task, o.getTask());
+                Objects.equals(task, o.getTaskContents());
     }
 
     @Override

@@ -27,6 +27,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  * <p>{@code SparkScalaTask}</p>
  *
@@ -52,25 +54,9 @@ public class SparkScalaTask extends BaseTask {
                            @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
                            @Assisted("taskid")   String taskId,
                            @Assisted("content")  String content,
-                           @Assisted Configuration taskConfiguration) {
+                           @Assisted @Nullable Configuration taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new SparkScalaTask with id: " + taskId);
-    }
-
-    /**
-     *
-     * Creates a SparkScalaTask with the specified id,scala script content and task configuration.
-     *
-     * @param taskId             Task Id
-     * @param content            Scala script (Spark) content
-     */
-    @AssistedInject
-    private SparkScalaTask(TemplateService templateService,
-                           @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
-                           @Assisted("taskid")   String taskId,
-                           @Assisted("content")  String content) {
-        super(taskId,content,templateService,jdbcTaskExecutor);
-        log.trace("Built a new SparkScalaTask with id: " + taskId);
+        log.trace("Built a new SparkScalaTask: " + this);
     }
 
 }

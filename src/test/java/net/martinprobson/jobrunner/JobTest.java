@@ -17,22 +17,21 @@ public class JobTest {
 
     private static Job job;
     private static Map<String,BaseTask> expectedTasks;
-    private static TaskFactory taskFactory;
+    private static TaskProvider taskProvider;
 
-    private static Map<String,BaseTask> getTasks() {
+    private static Map<String,BaseTask> getTasks() throws JobRunnerException {
         HashMap<String, BaseTask> tasks = new HashMap<>();
         String taskNames[] = {"t1", "t2", "t3", "t4","t5","t6","t7"};
         for (String task : taskNames)
             //@TODO Fix
-            tasks.put(task,taskFactory.createDummyTask(task,new CombinedConfiguration()));
+            tasks.put(task, taskProvider.createTask("dummy",task,""));
         return tasks;
     }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
-        Injector injector = Guice.createInjector(new JobRunnerModule());
-        taskFactory = injector.getInstance(TaskFactory.class);
+        taskProvider = TaskProvider.getInstance();
         job = new Job( () -> getTasks() );
         expectedTasks = getTasks();
     }

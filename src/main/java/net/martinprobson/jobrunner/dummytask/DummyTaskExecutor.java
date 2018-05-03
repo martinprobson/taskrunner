@@ -1,5 +1,11 @@
-package net.martinprobson.jobrunner;
+package net.martinprobson.jobrunner.dummytask;
 
+import com.google.inject.Inject;
+import net.martinprobson.jobrunner.BaseTask;
+import net.martinprobson.jobrunner.JobRunnerException;
+import net.martinprobson.jobrunner.TaskExecutor;
+import net.martinprobson.jobrunner.TaskResult;
+import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -42,7 +42,7 @@ public class JobRunnerConfigurationProvider implements ConfigurationProvider<Con
     }
 
     /**
-     * Helper method to get a {@code XMLConfiguration} from the classpath.
+     * Helper method to createTask a {@code XMLConfiguration} from the classpath.
      *
      * @param fileName Name of the XML configuration file to load.
      * @return - The loaded XMLConfiguration.

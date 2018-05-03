@@ -16,12 +16,14 @@
  */
 package net.martinprobson.jobrunner.jdbctask;
 
+import com.google.inject.Inject;
 import net.martinprobson.jobrunner.BaseTask;
 import net.martinprobson.jobrunner.JobRunnerException;
 import net.martinprobson.jobrunner.TaskExecutor;
 import net.martinprobson.jobrunner.TaskResult;
 import net.martinprobson.jobrunner.jdbcconnection.DBSource;
 import net.martinprobson.jobrunner.jdbcconnection.Kerberos;
+import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,10 @@ import java.util.regex.Pattern;
  */
 public class JDBCTaskExecutor implements TaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(JDBCTaskExecutor.class);
+
+    //@TODO Temp
+    @Inject
+    TemplateService template;
 
     /**
      * <p>
@@ -132,7 +138,7 @@ public class JDBCTaskExecutor implements TaskExecutor {
     @Override
     public void executeTask(BaseTask task) throws JobRunnerException {
         try {
-            ExecuteSqlStmts(task.getTemplatedTask());
+            ExecuteSqlStmts(task.getTemplatedTaskContents());
         } catch (JobRunnerException e) {
             task.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
             throw e;

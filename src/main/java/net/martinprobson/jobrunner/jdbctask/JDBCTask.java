@@ -26,6 +26,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+
 /**
  * <p>{@code JDBCTask}</p>
  *
@@ -36,40 +38,22 @@ import org.slf4j.LoggerFactory;
 public class JDBCTask extends BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(JDBCTask.class);
-    private static TaskExecutor taskExecutor = null;
 
     /**
      *
      * Creates a JDBCTask with the specified id,sql and task configuration.
      *
-     * @param taskId             Task Id
-     * @param content            Sql contents
+     * @param id Task Id
+     * @param task Sql contents
      * @param taskConfiguration  Task specification configuration XML filename.
      */
     @AssistedInject
     private JDBCTask(TemplateService templateService,
                      @Named("jdbc") TaskExecutor jdbcTaskExecutor,
-                     @Assisted("taskid") String taskId,
-                     @Assisted("content") String content,
-                     @Assisted Configuration taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new JDBCTask with id: " + taskId);
+                     @Assisted("id") String id,
+                     @Assisted("task") String task,
+                     @Assisted @Nullable Configuration taskConfiguration) {
+        super(id,task,taskConfiguration,templateService,jdbcTaskExecutor);
+        log.trace("Built a new JDBCTask: " + this);
     }
-
-    /**
-     *
-     * Creates a JDBCTask with the specified id,sql and task configuration.
-     *
-     * @param taskId             Task Id
-     * @param content            Sql contents
-     */
-    @AssistedInject
-    private JDBCTask(TemplateService templateService,
-                     @Named("jdbc") TaskExecutor jdbcTaskExecutor,
-                     @Assisted("taskid") String taskId,
-                     @Assisted("content") String content) {
-        super(taskId,content,templateService,jdbcTaskExecutor);
-        log.trace("Built a new JDBCTask with id: " + taskId);
-    }
-
 }

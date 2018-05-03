@@ -23,8 +23,7 @@ import static org.junit.Assert.assertEquals;
 public class LocalFileSystemTaskBuilderTest {
 
     private static Map<String,BaseTask> expectedResults = new HashMap<>();
-    private static TaskFactory taskFactory;
-    private static Injector injector;
+    private static TaskProvider taskProvider;
 
     /**
      * Given a filename of the form <code>hqlfile.hql</code>,
@@ -32,13 +31,13 @@ public class LocalFileSystemTaskBuilderTest {
      * in the same directory.
      *
      * @param directory - The directory to search.
-     * @param hqlFile - The name of the hqlFile.
+     * @param sqlFile - The name of the sqlFile.
      * @return - The full pathname of the xml file, or null if not found.
      */
-    private static String getConfigFile(File directory,String hqlFile) {
+    private static String getConfigFile(File directory,String sqlFile) {
         String configName = directory.getAbsolutePath() +
                 File.separatorChar +
-                FilenameUtils.getBaseName(hqlFile) +
+                FilenameUtils.getBaseName(sqlFile) +
                 ".xml";
         File configFile = new File(configName);
         if (configFile.exists() && configFile.isFile())
@@ -49,8 +48,7 @@ public class LocalFileSystemTaskBuilderTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        injector = Guice.createInjector(new JobRunnerModule());
-        taskFactory = injector.getInstance(TaskFactory.class);
+        taskProvider = TaskProvider.getInstance();
     }
 
     private void setUp() throws Exception {
@@ -63,10 +61,9 @@ public class LocalFileSystemTaskBuilderTest {
             String contents = FileUtils.readFileToString(file,Charset.defaultCharset());
             String configFile = getConfigFile(testDirectory,sqlFile);
             if (configFile == null)
-                //@TODO Fix
-                expectedResults.put(sqlFile,taskFactory.createJDBCTask(sqlFile,contents,new CombinedConfiguration()));
+                expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents));
             else
-                expectedResults.put(sqlFile, taskFactory.createJDBCTask(sqlFile,contents,TaskBuilder.getConfig(configFile)));
+                expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents,TaskBuilder.getConfig(configFile)));
         };
     }
 

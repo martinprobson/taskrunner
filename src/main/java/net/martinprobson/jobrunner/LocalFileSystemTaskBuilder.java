@@ -16,10 +16,6 @@
  */
 package net.martinprobson.jobrunner;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.assistedinject.Assisted;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -38,31 +34,24 @@ import java.util.Map;
  */
 public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
-    private static Injector injector = null;
     private String taskDirectory;
-    private String configDirectory;
-    private TaskFactory taskFactory;
+    private static TaskProvider taskProvider;
 
     public static LocalFileSystemTaskBuilder create(String taskDirectory,
                                                     String configDirectory) throws JobRunnerException {
-        if (injector == null) injector = Guice.createInjector(new JobRunnerModule());
-        LocalFileSystemTaskBuilderFactory factory = injector.getInstance(LocalFileSystemTaskBuilderFactory.class);
         File taskDir = new File(taskDirectory);
         if (!taskDir.exists() || !taskDir.isDirectory())
             throw new JobRunnerException("task directory " + taskDirectory + " does not exist");
         File configDir = new File(configDirectory);
         if (!configDir.exists() || !configDir.isDirectory())
             throw new JobRunnerException("config directory " + configDirectory + " does not exist");
-        return factory.create(taskDir.getAbsolutePath(),configDir.getAbsolutePath());
+        taskProvider = TaskProvider.getInstance();
+        return new LocalFileSystemTaskBuilder(taskDir.getAbsolutePath(),configDir.getAbsolutePath());
     }
 
-    @Inject
-    private LocalFileSystemTaskBuilder(TaskFactory taskFactory,
-                                       @Assisted("taskDirectory") String taskDirectory,
-                                       @Assisted("configDirectory") String configDirectory) {
-        this.taskFactory = taskFactory;
+    private LocalFileSystemTaskBuilder(String taskDirectory,String configDirectory) {
         this.taskDirectory = taskDirectory;
-        this.configDirectory = configDirectory;
+        String configDirectory1 = configDirectory;
     }
 
     /**
@@ -109,10 +98,10 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
                 String configFile = getConfigFile(testDirectory, sqlFile);
                 if (configFile == null)
                     taskMap.put(sqlFile,
-                            taskFactory.createJDBCTask(sqlFile,contents));
+                            taskProvider.createTask("jdbc",sqlFile,contents));
                 else
                     taskMap.put(sqlFile,
-                            taskFactory.createJDBCTask(sqlFile,contents,TaskBuilder.getConfig(configFile)));
+                            taskProvider.createTask("jdbc",sqlFile,contents,TaskBuilder.getConfig(configFile)));
             }
 
         return taskMap;

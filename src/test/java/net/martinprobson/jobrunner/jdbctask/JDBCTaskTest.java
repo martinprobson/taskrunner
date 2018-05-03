@@ -14,39 +14,37 @@ import static org.junit.Assert.*;
 
 public class JDBCTaskTest {
 
-    private static TaskFactory taskFactory;
+    private static TaskProvider taskProvider;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
-        Injector injector = Guice.createInjector(new JobRunnerModule());
-        taskFactory = injector.getInstance(TaskFactory.class);
-
+        taskProvider = TaskProvider.getInstance();
     }
 
     @Test
-    public void getTask() {
+    public void getTask() throws JobRunnerException {
         String sql = "create table foo (bar varchar(1));";
-        BaseTask jdbcTask = taskFactory.createJDBCTask("test",sql);
-        assert jdbcTask.getTask().equals(sql);
+        BaseTask jdbcTask = taskProvider.createTask("jdbc","test",sql);
+        assert jdbcTask.getTaskContents().equals(sql);
     }
 
     @Test
-    public void TestExecuteSuccess() {
+    public void TestExecuteSuccess() throws JobRunnerException {
         String sql = "create table foo (bar varchar(1));";
-        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSuccess 1",sql);
+        BaseTask jdbcTask = taskProvider.createTask("jdbc","TestExecuteSuccess 1",sql);
         TaskResult result = jdbcTask.execute();
         assertTrue(result.succeeded());
         String sql2 = "insert into foo values ('1'); insert into foo values ('2');drop table foo;";
-        BaseTask jdbcTask2 = taskFactory.createJDBCTask("TestExecuteSuccess 2",sql2);
+        BaseTask jdbcTask2 = taskProvider.createTask("jdbc","TestExecuteSuccess 2",sql2);
         TaskResult result2 = jdbcTask2.execute();
         assertTrue(result2.succeeded());
     }
 
     @Test
-    public void TestExecuteFailure() {
+    public void TestExecuteFailure() throws JobRunnerException {
         String sql = "insert into bob values ('1');";
-        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteFailure",sql);
+        BaseTask jdbcTask = taskProvider.createTask("jdbc","TestExecuteFailure",sql);
         try {
             TaskResult result = jdbcTask.execute();
         } catch (TaskExecutionException e) {
@@ -58,13 +56,13 @@ public class JDBCTaskTest {
 
     @Test
     //@TODO For POC
-    public void TestExecuteSelect() {
+    public void TestExecuteSelect() throws JobRunnerException {
         StringBuilder sb = new StringBuilder("create table bar (foo varchar(1));");
         sb.append("insert into bar values ('1');");
         sb.append("insert into bar values ('2');");
         sb.append("select * from bar;");
         sb.append("drop table bar;");
-        BaseTask jdbcTask = taskFactory.createJDBCTask("TestExecuteSelect 1",sb.toString());
+        BaseTask jdbcTask = taskProvider.createTask("jdbc","TestExecuteSelect 1",sb.toString());
         TaskResult result = jdbcTask.execute();
         assertTrue(result.succeeded());
     }
