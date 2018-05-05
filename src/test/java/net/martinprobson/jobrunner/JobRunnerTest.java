@@ -1,6 +1,8 @@
 package net.martinprobson.jobrunner;
 
 import com.github.dexecutor.core.ExecutionConfig;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static net.martinprobson.jobrunner.TaskResult.Result.NOT_EXECUTED;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
@@ -117,5 +120,22 @@ public class JobRunnerTest {
             assertEquals("Task: " + task.getId() + " expected: " + expected + " actual: " + actual,
                     expected,actual);
         }
+        //
+        // and the other way around...
+        // check expected results against actual results.
+        //
+        for (String e: expectedResults.keySet()) {
+            TaskResult.Result expected = expectedResults.get(e).getExpResult();
+            if (expected.equals(NOT_EXECUTED)) continue;
+            TaskResult.Result actual = null;
+            try {
+                actual = config.getJob().getId(e).getTaskResult().getResult();
+            } catch (NullPointerException npe) {
+                fail("Actual result missing for expected result: " + e + " " + expected);
+            }
+            assertEquals("Task expected result: " + expected + "  actual: " + actual,
+                    expected,actual);
+        }
+
     }
 }

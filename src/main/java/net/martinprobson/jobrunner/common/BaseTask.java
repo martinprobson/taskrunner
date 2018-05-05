@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-package net.martinprobson.jobrunner;
+package net.martinprobson.jobrunner.common;
 
 import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.ExecutionResults;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskExecutionException;
+import net.martinprobson.jobrunner.JobRunnerConfigurationProvider;
+import net.martinprobson.jobrunner.TaskResult;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import net.martinprobson.jobrunner.dummytask.DummyTask;
 import net.martinprobson.jobrunner.template.TemplateException;
 import net.martinprobson.jobrunner.template.TemplateService;
 import org.apache.commons.configuration2.CombinedConfiguration;
@@ -157,7 +158,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * @return the task contents after template has been applied
      */
-    public String getTemplatedTaskContents() throws JobRunnerException {
+    public String getRenderedTaskContents() throws JobRunnerException {
         try {
             return templateService.apply(getId(), getTaskContents(),getConfiguration());
         } catch (TemplateException e) {
@@ -194,7 +195,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * list must have a successful status in order for this Task to run.
      * @return The list of {@code taskIds} that this Task is dependent on. List returned can be empty.
      */
-    List<String> getDependencies() {
+    public List<String> getDependencies() {
         return getConfiguration().getList(String.class, TASK_DEPENDENCY_KEY, new ArrayList<>());
     }
 
@@ -275,15 +276,6 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * Logger
      */
-    private static final Logger log = LoggerFactory.getLogger(DummyTask.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseTask.class);
 
-    private static void randomDelay(float min, float max){
-        int random = (int)(max * Math.random() + min);
-        try {
-            Thread.sleep(random * 1000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 }

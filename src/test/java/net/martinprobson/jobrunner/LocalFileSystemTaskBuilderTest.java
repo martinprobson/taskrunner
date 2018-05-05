@@ -1,9 +1,8 @@
 package net.martinprobson.jobrunner;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;

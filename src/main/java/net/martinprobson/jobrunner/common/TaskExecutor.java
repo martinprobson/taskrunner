@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.martinprobson.jobrunner;
+package net.martinprobson.jobrunner.common;
 
-import net.martinprobson.jobrunner.template.TemplateService;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 
 /**
  * A TaskExecutor can execute a passed Task.

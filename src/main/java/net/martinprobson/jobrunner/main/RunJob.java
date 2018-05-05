@@ -2,6 +2,7 @@ package net.martinprobson.jobrunner.main;
 
 import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.apache.commons.cli.*;
 

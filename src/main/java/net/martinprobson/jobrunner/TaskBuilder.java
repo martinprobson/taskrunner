@@ -16,6 +16,8 @@
  */
 package net.martinprobson.jobrunner;
 
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;

@@ -18,6 +18,7 @@
 package net.martinprobson.jobrunner.configurationservice;
 
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.XMLConfiguration;
 
 /**
  * {@code ConfigurationService}

@@ -1,4 +1,4 @@
-package net.martinprobson.jobrunner.jdbcconnection;
+package net.martinprobson.jobrunner.jdbctask;
 
 /**
  * Interface to allow extra parameters to be added to JDBC connection string.

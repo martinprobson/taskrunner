@@ -16,21 +16,15 @@
  */
 package net.martinprobson.jobrunner;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import net.martinprobson.jobrunner.dummytask.DummyTaskModule;
-import net.martinprobson.jobrunner.jdbctask.JDBCTaskModule;
-import net.martinprobson.jobrunner.sparkscalatask.SparkScalaTask;
-import net.martinprobson.jobrunner.sparkscalatask.SparkScalaTaskModule;
-import org.apache.commons.configuration2.CombinedConfiguration;
+import com.google.inject.*;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
+import net.martinprobson.jobrunner.configurationservice.ConfigurationProvider;
 import org.apache.commons.configuration2.Configuration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * <h2>{@code TaskProvider}</h2>
@@ -49,17 +43,39 @@ import java.util.Map;
  */
 public class TaskProvider {
 
-    private static TaskProvider singleton;
-    private Map<String,TaskFactory> taskMapping;
 
     /**
-     * The Mapping between task type (String) and a factory that can
-     * build that type of task is injected into this class.
-     * @param taskMapping Task type -> Task mapping (injected).
+     * <h3>{@code fileExtensionCreateTask}</h3>
+     * <p>Construct a new Task based on the passed {@code fileExtension}</p><p></p>
+     * <h4>Detail</h4>
+     * Internally, a {@code TaskProvider} holds a mapping between file extension and
+     * task type (obtained from configuration). Therefore this method can be used by a
+     * file system Task builder to obtain a task of the correct type, based on the file
+     * extension being processed.
+     * If no mapping is found between file type and Task, then a TaskProviderMapping exception is
+     * thrown for the caller to deal with.
+     *
+     * @param fileExtension The file extension to process (in the form e.g {@code sql}
+     * @param taskId The task id.
+     * @param taskContent Task content
+     * @param taskConfiguration (Optional) task specific configuration.
+     * @return An {@code Optional<BaseTask>}
+     * @throws JobRunnerException General error occurred.
+     * @throws TaskProviderMappingException If no mapping between file extension and {@code Task} can be found.
      */
-    @Inject
-    private TaskProvider(Map<String, TaskFactory> taskMapping) {
-        this.taskMapping = taskMapping;
+    public Optional<BaseTask> fileExtensionCreateTask(String fileExtension,
+                                                      String taskId,
+                                                      String taskContent,
+                                                      Configuration taskConfiguration ) throws JobRunnerException {
+        String taskType = pluginConfig.fileExtensionMapping.get(fileExtension.toLowerCase());
+        if (taskType == null)
+            return Optional.empty();
+        else
+            return Optional.of(createTask(taskType, taskId, taskContent, taskConfiguration));
+    }
+
+    public String[] getSupportedFileExtensions() {
+        return pluginConfig.fileExtensionMapping.keySet().toArray(new String[0]);
     }
 
     /**
@@ -115,33 +131,40 @@ public class TaskProvider {
      */
     public static TaskProvider getInstance() {
         if (singleton == null) {
-            Injector injector = Guice.createInjector(new DummyTaskModule(),
-                                                     new JDBCTaskModule(),
-                                                     new SparkScalaTaskModule());
+            try {
+                pluginConfig = taskConfig.getConfiguration();
+            } catch (Exception e) {
+                throw new java.util.ServiceConfigurationError("Error occured during task configuration.",e);
+            }
+            Injector injector = Guice.createInjector(pluginConfig.pluginModules);
             singleton = injector.getInstance(TaskProvider.class);
         }
         return singleton;
     }
 
-    //@TODO Remove
-    public static void main(String args[]) {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("reference_config.xml")));
-        TaskProvider taskProvider = TaskProvider.getInstance();
-        BaseTask d = null;
-        List<BaseTask> tasks = new ArrayList<>();
-        try {
-            tasks.add(taskProvider.createTask("dummy","Martin","contents",new CombinedConfiguration()));
-            tasks.add(taskProvider.createTask("dummy","Martin2","contents"));
-            tasks.add(taskProvider.createTask("jdbc","Martin","contents",new CombinedConfiguration()));
-            tasks.add(taskProvider.createTask("jdbc","Martin2","contents"));
-            tasks.add(taskProvider.createTask("spark-scala","Martin","contents",new CombinedConfiguration()));
-            tasks.add(taskProvider.createTask("spark-scala","Martin2","contents"));
+    private static TaskProvider singleton;
 
-        } catch (JobRunnerException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Done");
+    /**
+     * A Map of known Tasks.
+     */
+    private Map<String,TaskFactory> taskMapping;
+
+    /**
+     * PluginTaskConfiguration - The Tasks and corresponding file extension mappings
+     * that this TaskProvider knows about.
+     */
+    private static PluginTaskConfiguration pluginConfig;
+
+    private static ConfigurationProvider<PluginTaskConfiguration> taskConfig = new PluginTaskConfigurationProvider();
+
+    /**
+     * The Mapping between task type (String) and a factory that can
+     * build that type of task is injected into this class.
+     * @param taskMapping Task type -> Task mapping (injected).
+     */
+    @Inject
+    private TaskProvider(Map<String, TaskFactory> taskMapping) {
+        this.taskMapping = taskMapping;
     }
-
 }
 

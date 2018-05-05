@@ -47,7 +47,7 @@ public class JobRunnerConfigurationProvider implements ConfigurationProvider<Con
      * @param fileName Name of the XML configuration file to load.
      * @return - The loaded XMLConfiguration.
      */
-    static XMLConfiguration getXmlConfig(String fileName) {
+    public static XMLConfiguration getXmlConfig(String fileName) {
         XMLConfiguration config = null;
         FileBasedConfigurationBuilder<XMLConfiguration> builder =
                 new FileBasedConfigurationBuilder<>(XMLConfiguration.class)

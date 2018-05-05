@@ -1,4 +1,4 @@
-package net.martinprobson.jobrunner;
+package net.martinprobson.jobrunner.common;
 
 public class JobRunnerException extends Exception {
 

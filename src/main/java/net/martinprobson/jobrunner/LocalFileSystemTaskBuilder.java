@@ -16,6 +16,9 @@
  */
 package net.martinprobson.jobrunner;
 
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -34,8 +37,13 @@ import java.util.Map;
  */
 public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
-    private String taskDirectory;
     private static TaskProvider taskProvider;
+    private String taskDirectory;
+
+    private LocalFileSystemTaskBuilder(String taskDirectory, String configDirectory) {
+        this.taskDirectory = taskDirectory;
+        String configDirectory1 = configDirectory;
+    }
 
     public static LocalFileSystemTaskBuilder create(String taskDirectory,
                                                     String configDirectory) throws JobRunnerException {
@@ -46,37 +54,34 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
         if (!configDir.exists() || !configDir.isDirectory())
             throw new JobRunnerException("config directory " + configDirectory + " does not exist");
         taskProvider = TaskProvider.getInstance();
-        return new LocalFileSystemTaskBuilder(taskDir.getAbsolutePath(),configDir.getAbsolutePath());
-    }
-
-    private LocalFileSystemTaskBuilder(String taskDirectory,String configDirectory) {
-        this.taskDirectory = taskDirectory;
-        String configDirectory1 = configDirectory;
+        return new LocalFileSystemTaskBuilder(taskDir.getAbsolutePath(), configDir.getAbsolutePath());
     }
 
     /**
-     * Given a filename of the form <code>file.sql</code>,
+     * <p>Given a filename of the form {@code file.<ext>}
      * attempt to find a corresponding <code>file.xml</code> file
-     * in the same directory.
+     * in the same directory.</p>
+     * <p>If found, then load the task specific configuration from
+     * the file.</p>
+     * <p>If not found, just return an empty configuration.</p>
      *
      * @param directory - The directory to search.
-     * @param sqlFile - The name of the sqlFile.
-     * @return - The full pathname of the xml file, or null if not found.
+     * @param file      - The name of the file.
+     * @return - An {@code XMLConfiguration}.
      */
-    private static String getConfigFile(File directory,String sqlFile) {
+    private static XMLConfiguration getTaskConfiguration(File directory, String file) {
         String configName = directory.getAbsolutePath() +
                 File.separatorChar +
-                FilenameUtils.getBaseName(sqlFile) +
+                FilenameUtils.getBaseName(file) +
                 ".xml";
         File configFile = new File(configName);
         if (configFile.exists() && configFile.isFile())
-            return configFile.getAbsolutePath();
+            return TaskBuilder.getConfig(configFile.getAbsolutePath());
         else
-            return null;
+            return new XMLConfiguration();
     }
 
     /**
-     *
      * @return A collection of Tasks built from specific base directory.
      * @throws JobRunnerException
      */
@@ -85,25 +90,25 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
         Map<String, BaseTask> taskMap = new HashMap<>();
         File testDirectory = new File(taskDirectory);
-        String[] sqlFiles = testDirectory.list(new SuffixFileFilter(".sql"));
-        if (sqlFiles != null)
-            for (String sqlFile : sqlFiles) {
-                File file = new File(testDirectory.getAbsolutePath() + File.separatorChar + sqlFile);
+        String[] taskFiles = testDirectory.list(new SuffixFileFilter(taskProvider.getSupportedFileExtensions()));
+        if (taskFiles != null)
+            for (String taskFile : taskFiles) {
+                File file = new File(testDirectory.getAbsolutePath() + File.separatorChar + taskFile);
+                String fileExtension = FilenameUtils.getExtension(file.getName());
                 String contents;
                 try {
                     contents = FileUtils.readFileToString(file, Charset.defaultCharset());
                 } catch (IOException e) {
                     throw new JobRunnerException("Error reading file: " + file, e);
                 }
-                String configFile = getConfigFile(testDirectory, sqlFile);
-                if (configFile == null)
-                    taskMap.put(sqlFile,
-                            taskProvider.createTask("jdbc",sqlFile,contents));
-                else
-                    taskMap.put(sqlFile,
-                            taskProvider.createTask("jdbc",sqlFile,contents,TaskBuilder.getConfig(configFile)));
+                XMLConfiguration taskConfig = getTaskConfiguration(testDirectory, taskFile);
+                BaseTask task = taskProvider.fileExtensionCreateTask("." + fileExtension,
+                        taskFile,
+                        contents,
+                        taskConfig)
+                        .orElseThrow(() -> new JobRunnerException("No mapping found for " + fileExtension.toLowerCase()));
+                taskMap.put(taskFile, task);
             }
-
         return taskMap;
     }
 }

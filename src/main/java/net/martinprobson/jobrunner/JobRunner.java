@@ -19,6 +19,8 @@ package net.martinprobson.jobrunner;
 import com.github.dexecutor.core.DefaultDexecutor;
 import com.github.dexecutor.core.ExecutionConfig;
 import com.github.dexecutor.core.task.ExecutionResults;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.monitor.SimpleMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

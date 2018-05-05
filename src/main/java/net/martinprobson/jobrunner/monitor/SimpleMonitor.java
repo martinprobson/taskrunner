@@ -1,6 +1,7 @@
 package net.martinprobson.jobrunner.monitor;
 
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import net.martinprobson.jobrunner.main.RunJob;
 import org.slf4j.Logger;

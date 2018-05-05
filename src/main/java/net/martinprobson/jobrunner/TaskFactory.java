@@ -16,7 +16,7 @@
  */
 package net.martinprobson.jobrunner;
 
-import com.google.inject.assistedinject.Assisted;
+import net.martinprobson.jobrunner.common.BaseTask;
 import org.apache.commons.configuration2.Configuration;
 
 /**

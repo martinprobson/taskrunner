@@ -1,9 +1,9 @@
 package net.martinprobson.jobrunner.jdbctask;
 
 import com.github.dexecutor.core.task.TaskExecutionException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.commons.configuration2.CombinedConfiguration;

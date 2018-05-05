@@ -17,6 +17,8 @@
 package net.martinprobson.jobrunner;
 
 import com.github.dexecutor.core.task.TaskProvider;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -50,6 +52,15 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
      */
     public Boolean hasId(String id) {
         return tasks.containsKey(id);
+    }
+
+    /**
+     * Get the task with the corresponding id.
+     * @param id Task id
+     * @return BaseTask or null if not found.
+     */
+    public BaseTask getId(String id) {
+        return tasks.get(id);
     }
 
     /**

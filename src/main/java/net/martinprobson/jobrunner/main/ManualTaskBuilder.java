@@ -1,7 +1,8 @@
 package net.martinprobson.jobrunner.main;
 
-import com.google.inject.Inject;
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

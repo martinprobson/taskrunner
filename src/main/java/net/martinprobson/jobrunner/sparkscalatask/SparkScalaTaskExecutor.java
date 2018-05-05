@@ -16,12 +16,10 @@
  */
 package net.martinprobson.jobrunner.sparkscalatask;
 
-import com.google.inject.Inject;
-import net.martinprobson.jobrunner.BaseTask;
-import net.martinprobson.jobrunner.JobRunnerException;
-import net.martinprobson.jobrunner.TaskExecutor;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.JobRunnerException;
+import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.TaskResult;
-import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martinr
  */
-public class SparkScalaTaskExecutor implements TaskExecutor {
+class SparkScalaTaskExecutor implements TaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(SparkScalaTaskExecutor.class);
 
     /**
@@ -46,7 +44,7 @@ public class SparkScalaTaskExecutor implements TaskExecutor {
     @Override
     public void executeTask(BaseTask task) throws JobRunnerException {
         try {
-            execute(task.getTemplatedTaskContents());
+            execute(task.getRenderedTaskContents());
         } catch (JobRunnerException e) {
             task.setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
             throw e;

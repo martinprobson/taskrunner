@@ -16,13 +16,11 @@
  */
 package net.martinprobson.jobrunner.configurationservice;
 
-import org.apache.commons.configuration2.ImmutableConfiguration;
-
 /**
  * {@code ConfigurationProvider}
  *
  * @author martinr
  */
-public interface ConfigurationProvider<T extends ImmutableConfiguration> {
+public interface ConfigurationProvider<T> {
     T getConfiguration();
 }

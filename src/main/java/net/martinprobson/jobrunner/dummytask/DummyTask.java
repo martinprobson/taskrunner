@@ -18,12 +18,11 @@ package net.martinprobson.jobrunner.dummytask;
 
 import javax.annotation.Nullable;
 
-import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
-import net.martinprobson.jobrunner.BaseTask;
-import net.martinprobson.jobrunner.TaskExecutor;
+import net.martinprobson.jobrunner.common.BaseTask;
+import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author martinr
  */
-public class DummyTask extends BaseTask {
+class DummyTask extends BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(DummyTask.class);
 

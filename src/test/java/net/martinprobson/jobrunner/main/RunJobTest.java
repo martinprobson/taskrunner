@@ -1,9 +1,8 @@
 package net.martinprobson.jobrunner.main;
 
-import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
+import static net.martinprobson.jobrunner.TaskResult.Result.NOT_EXECUTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -83,7 +80,8 @@ public class RunJobTest {
         String cfg = Paths.get("src","test","resources","test_global_config.xml").toFile().getAbsolutePath();
         int rc = RunJob.run(testDir,testDir,cfg);
         assertEquals(0,rc);
-        // Check expected results against actual task results.
+        //
+        // Check actual task results against expected results
         //
         for (BaseTask task: RunJob.getJob()) {
             TaskResult.Result expected = expectedResults.get(task.getId()).getExpResult();
@@ -91,5 +89,23 @@ public class RunJobTest {
             assertEquals("Task: " + task.getId() + " expected: " + expected + " actual: " + actual,
                     expected,actual);
         }
+        //
+        // and the other way around...
+        // check expected results against actual results.
+        //
+        for (String e: expectedResults.keySet()) {
+            TaskResult.Result expected = expectedResults.get(e).getExpResult();
+            if (expected.equals(NOT_EXECUTED)) continue;
+            TaskResult.Result actual = null;
+            try {
+                actual = RunJob.getJob().getId(e).getTaskResult().getResult();
+            } catch (NullPointerException npe) {
+                fail("Actual result missing for expected result: " + e + " " + expected);
+            }
+            assertEquals("Task expected result: " + expected + "  actual: " + actual,
+                    expected,actual);
+        }
+
+
     }
 }

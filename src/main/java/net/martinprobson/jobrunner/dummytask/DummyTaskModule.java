@@ -2,11 +2,11 @@ package net.martinprobson.jobrunner.dummytask;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryProvider;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.FreeMarkerTemplateService;
 import net.martinprobson.jobrunner.template.TemplateService;
 

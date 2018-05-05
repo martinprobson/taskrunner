@@ -4,23 +4,6 @@
     <dependency-key>
         depends-on.id
     </dependency-key>
-    <tasks>
-        <name>dummy</name>
-        <file-extensions>
-            txt,dmy
-        </file-extensions>
-        <implementing-class>
-            net.martinprobson.jobrunner.dummytask.DummyTask
-        </implementing-class>
-        <executor>
-            net.martinprobson.jobrunner.dummytask.DummyTaskExecutor
-        </executor>
-        <name>jdbc</name>
-        <implementing-class>
-            net.martinprobson.jobrunner.dummytask.DummyTaskExecutor
-        </implementing-class>
-
-    </tasks>
 </configuration>
  
 
