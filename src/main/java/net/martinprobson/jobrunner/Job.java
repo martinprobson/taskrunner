@@ -17,7 +17,6 @@
 package net.martinprobson.jobrunner;
 
 import com.github.dexecutor.core.task.TaskProvider;
-import com.sun.istack.NotNull;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 
@@ -76,7 +75,7 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
     }
 
     @Override
-    public @NotNull Iterator<BaseTask> iterator() {
+    public Iterator<BaseTask> iterator() {
         return tasks.values().iterator();
     }
 

@@ -5,7 +5,6 @@ import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.apache.commons.configuration2.CombinedConfiguration;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -69,7 +68,6 @@ public class JDBCTaskTest {
         EqualsVerifier.forClass(JDBCTask.class)
                 .usingGetClass()
                 .withIgnoredFields("taskExecutor","config","id","considerExecutionError","result","templateService")
-                .withPrefabValues(CombinedConfiguration.class,new CombinedConfiguration(),new CombinedConfiguration())
                 .verify();
     }
 

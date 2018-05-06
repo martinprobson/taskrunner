@@ -2,7 +2,6 @@ package net.martinprobson.jobrunner.template;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
