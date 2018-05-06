@@ -1,5 +1,7 @@
 package net.martinprobson.jobrunner.template;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
@@ -32,7 +34,7 @@ public class FreeMarkerTemplateServiceTest {
         FreeMarkerTemplateService service = new FreeMarkerTemplateService();
         String actual = null;
         try {
-            actual = service.apply("templateTest1.txt",content,new XMLConfiguration());
+            actual = service.apply("templateTest1.txt",content,ConfigFactory.empty());
         } catch (TemplateException e) {
             fail("Unexpected exception ");
         }
@@ -45,9 +47,7 @@ public class FreeMarkerTemplateServiceTest {
         String expected = readFile(testDir,"templateTest2.expected");
         FreeMarkerTemplateService service = new FreeMarkerTemplateService();
         String actual = null;
-        XMLConfiguration config = new XMLConfiguration();
-        config.addProperty("template.queue","queuename");
-        config.addProperty("template.dummy","dummy1");
+        Config config = ConfigFactory.load("freemarkertest1");
         try {
             actual = service.apply("templateTest2.txt",testCase,config);
         } catch (TemplateException e) {
@@ -68,8 +68,7 @@ public class FreeMarkerTemplateServiceTest {
         thrown.expectMessage(startsWith("TemplateException"));
 
         String actual = null;
-        XMLConfiguration config = new XMLConfiguration();
-        config.addProperty("template.dummy","dummy1");
+        Config config = ConfigFactory.load("freemarkertest2");
         thrown.expect(TemplateException.class);
         actual = service.apply("templateTest2.txt",testCase,config);
         fail("Expected exception");

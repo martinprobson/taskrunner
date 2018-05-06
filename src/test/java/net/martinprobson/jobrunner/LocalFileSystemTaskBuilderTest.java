@@ -1,8 +1,9 @@
 package net.martinprobson.jobrunner;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -25,25 +26,29 @@ public class LocalFileSystemTaskBuilderTest {
     private static TaskProvider taskProvider;
 
     /**
-     * Given a filename of the form <code>hqlfile.hql</code>,
-     * attempt to find a corresponding <code>hqlfile.xml</code> file
-     * in the same directory.
+     * <p>Given a filename of the form {@code file.<ext>}
+     * attempt to find a corresponding <code>file.conf</code> file
+     * in the same directory.</p>
+     * <p>If found, then load the task specific configuration from
+     * the file.</p>
+     * <p>If not found, just return an empty configuration.</p>
      *
      * @param directory - The directory to search.
-     * @param sqlFile - The name of the sqlFile.
-     * @return - The full pathname of the xml file, or null if not found.
+     * @param file      - The name of the file.
+     * @return - A {@code Config}.
      */
-    private static String getConfigFile(File directory,String sqlFile) {
+    private static Config getTaskConfiguration(File directory, String file) {
         String configName = directory.getAbsolutePath() +
                 File.separatorChar +
-                FilenameUtils.getBaseName(sqlFile) +
-                ".xml";
+                FilenameUtils.getBaseName(file) +
+                ".conf";
         File configFile = new File(configName);
         if (configFile.exists() && configFile.isFile())
-            return configFile.getAbsolutePath();
+            return ConfigFactory.parseFile(configFile);
         else
-            return null;
+            return ConfigFactory.empty();
     }
+
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -51,18 +56,14 @@ public class LocalFileSystemTaskBuilderTest {
     }
 
     private void setUp() throws Exception {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
         ClassLoader classLoader = getClass().getClassLoader();
         File testDirectory = new File(classLoader.getResource("taskrunner_test1").getFile());
         String[] sqlFiles = testDirectory.list(new SuffixFileFilter(".sql"));
         for (String sqlFile: sqlFiles) {
             File file = new File(testDirectory.getAbsolutePath() + File.separatorChar + sqlFile);
             String contents = FileUtils.readFileToString(file,Charset.defaultCharset());
-            String configFile = getConfigFile(testDirectory,sqlFile);
-            if (configFile == null)
-                expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents));
-            else
-                expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents,TaskBuilder.getConfig(configFile)));
+            Config config = getTaskConfiguration(testDirectory,sqlFile);
+            expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents,config));
         };
     }
 

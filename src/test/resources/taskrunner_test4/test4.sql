@@ -1,5 +1,5 @@
-CREATE TABLE test4 (
+CREATE TABLE taskrunner_test4 (
     cola int,
     colb int );
-Drop table test4;
+Drop table taskrunner_test4;
 

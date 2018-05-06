@@ -16,9 +16,8 @@
  */
 package net.martinprobson.jobrunner.jdbctask;
 
-
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import org.apache.commons.configuration2.ImmutableConfiguration;
+import com.typesafe.config.Config;
+import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +43,15 @@ class DBConnection implements ConnectionFactory {
     private static final String JDBC_DRIVER_CLASSNAME;
     private static final String JDBC_URL;
 
-    private static final ImmutableConfiguration CONFIG;
     private static final List<URLAppender> appenders = new ArrayList<>();
     private static final Logger log = LoggerFactory.getLogger(DBConnection.class);
 
     static {
-        CONFIG = ConfigurationService.getConfiguration();
-        JDBC_USERNAME = CONFIG.getString("jdbc.username");
-        JDBC_PASSWORD = CONFIG.getString("jdbc.password");
-        JDBC_DRIVER_CLASSNAME = CONFIG.getString("jdbc.driver");
-        JDBC_URL = CONFIG.getString("jdbc.url");
+        Config cfg = new GlobalConfigurationProvider().getConfiguration();
+        JDBC_USERNAME = cfg.getString("jdbc.username");
+        JDBC_PASSWORD = cfg.getString("jdbc.password");
+        JDBC_DRIVER_CLASSNAME = cfg.getString("jdbc.driver");
+        JDBC_URL = cfg.getString("jdbc.url");
     }
 
     private String url;

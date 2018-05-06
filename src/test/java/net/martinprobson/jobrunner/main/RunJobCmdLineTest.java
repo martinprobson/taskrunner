@@ -27,7 +27,6 @@ public class RunJobCmdLineTest {
     public void testHelpOption() {
         exit.expectSystemExitWithStatus(0);
         exit.checkAssertionAfterwards(() -> {
-            assertThat(systemOutRule.getLog(),containsString("-conf"));
             assertThat(systemOutRule.getLog(),containsString("-taskConf"));
             assertThat(systemOutRule.getLog(),containsString("-tasks"));
             assertThat(systemOutRule.getLog(),containsString("-help"));
@@ -39,19 +38,6 @@ public class RunJobCmdLineTest {
     }
 
     @Test
-    public void testMissingConf() {
-        exit.expectSystemExitWithStatus(2);
-        exit.checkAssertionAfterwards(() -> {
-            assertThat(systemErrRule.getLog(),containsString("At least one global configuration file must be specified"));
-            assertEquals(systemOutRule.getLog(),"");
-        });
-
-        String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-        String[] args = {"-taskConf",test1,"-tasks",test1};
-        RunJob.main(args);
-    }
-
-    @Test
     public void testMissingTaskConf() {
         exit.expectSystemExitWithStatus(2);
         exit.checkAssertionAfterwards(() -> {
@@ -59,9 +45,8 @@ public class RunJobCmdLineTest {
             assertEquals(systemOutRule.getLog(),"");
         });
         String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-        String conf = Paths.get("src","test","resources","runjob_test1","global.xml").toFile().getAbsolutePath();
 
-        String[] args = {"-conf",conf,"-tasks","test1"};
+        String[] args = {"-tasks","test1"};
         RunJob.main(args);
     }
 
@@ -73,9 +58,8 @@ public class RunJobCmdLineTest {
             assertEquals(systemOutRule.getLog(),"");
         });
         String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-        String conf = Paths.get("src","test","resources","runjob_test1","global.xml").toFile().getAbsolutePath();
 
-        String[] args = {"-conf",conf,"-taskConf",test1};
+        String[] args = {"-taskConf",test1};
         RunJob.main(args);
     }
 
@@ -87,9 +71,8 @@ public class RunJobCmdLineTest {
             assertEquals(systemOutRule.getLog(),"");
         });
         String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-        String conf = Paths.get("src","test","resources","runjob_test1","global.xml").toFile().getAbsolutePath();
 
-        String[] args = {"-conf",conf,"-taskConf",test1,"-tasks","foo"};
+        String[] args = {"-taskConf",test1,"-tasks","foo"};
         RunJob.main(args);
     }
 
@@ -101,31 +84,16 @@ public class RunJobCmdLineTest {
             assertEquals(systemOutRule.getLog(),"");
         });
         String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-        String conf = Paths.get("src","test","resources","runjob_test1","global.xml").toFile().getAbsolutePath();
 
-        String[] args = {"-conf",conf,"-taskConf","foo","-tasks",test1};
+        String[] args = {"-taskConf","foo","-tasks",test1};
         RunJob.main(args);
     }
 
-    @Test
-    public void testInvalidConf() {
-        exit.expectSystemExitWithStatus(2);
-        exit.checkAssertionAfterwards(() -> {
-            assertThat(systemErrRule.getLog(),containsString("foo does not exist"));
-            assertEquals(systemOutRule.getLog(),"");
-        });
-        String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-
-        String[] args = {"-conf","foo","-taskConf",test1,"-tasks",test1};
-        RunJob.main(args);
-    }
-
-    @Test
+     @Test
     public void testInvalidOpt() {
         exit.expectSystemExitWithStatus(2);
         exit.checkAssertionAfterwards(() -> {
             assertThat(systemErrRule.getLog(),containsString("Unrecognized option: -foo"));
-            assertThat(systemOutRule.getLog(),containsString("-conf"));
             assertThat(systemOutRule.getLog(),containsString("-taskConf"));
             assertThat(systemOutRule.getLog(),containsString("-tasks"));
             assertThat(systemOutRule.getLog(),containsString("-help"));

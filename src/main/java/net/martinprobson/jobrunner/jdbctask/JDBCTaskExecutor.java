@@ -16,12 +16,10 @@
  */
 package net.martinprobson.jobrunner.jdbctask;
 
-import com.google.inject.Inject;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.TaskResult;
-import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +40,6 @@ import java.util.regex.Pattern;
  */
 class JDBCTaskExecutor implements TaskExecutor {
     private static final Logger log = LoggerFactory.getLogger(JDBCTaskExecutor.class);
-
-    //@TODO Temp
-    @Inject
-    TemplateService template;
 
     /**
      * <p>

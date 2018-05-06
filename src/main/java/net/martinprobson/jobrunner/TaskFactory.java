@@ -16,15 +16,15 @@
  */
 package net.martinprobson.jobrunner;
 
+import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.common.BaseTask;
-import org.apache.commons.configuration2.Configuration;
 
 /**
  * <h3>TaskFactory</h3>
  * <p>The interface is used by Guice to create new {@code BaseTask} instances.</p>
  */
 public interface TaskFactory {
-    BaseTask create(String id, String task, Configuration taskConfiguration);
+    BaseTask create(String id, String task, Config taskConfiguration);
 //    BaseTask create(@Assisted("id") String id, @Assisted("task") String task);
 
 }

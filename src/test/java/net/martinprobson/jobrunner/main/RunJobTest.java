@@ -2,7 +2,6 @@ package net.martinprobson.jobrunner.main;
 
 import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.common.BaseTask;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +26,6 @@ public class RunJobTest {
         this.testNumber = testNumber;
         this.testDir = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(testBaseDir)).getFile()).getAbsolutePath();
     }
-
-    private static final Logger log = LoggerFactory.getLogger(RunJobTest.class);
 
     private int testNumber;
     private String testDir;
@@ -70,15 +67,12 @@ public class RunJobTest {
 
     @Before
     public void setUp() throws Exception {
-        // Wire up our configuration to our global configuration service.
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
         expectedResults = getExpectedResults(testDir);
     }
 
     @Test
     public void execute() {
-        String cfg = Paths.get("src","test","resources","test_global_config.xml").toFile().getAbsolutePath();
-        int rc = RunJob.run(testDir,testDir,cfg);
+        int rc = RunJob.run(testDir,testDir);
         assertEquals(0,rc);
         //
         // Check actual task results against expected results

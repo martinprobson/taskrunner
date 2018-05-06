@@ -21,18 +21,17 @@ import com.github.dexecutor.core.task.ExecutionResult;
 import com.github.dexecutor.core.task.ExecutionResults;
 import com.github.dexecutor.core.task.Task;
 import com.github.dexecutor.core.task.TaskExecutionException;
-import net.martinprobson.jobrunner.JobRunnerConfigurationProvider;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import net.martinprobson.jobrunner.TaskResult;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
+import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import net.martinprobson.jobrunner.template.TemplateException;
 import net.martinprobson.jobrunner.template.TemplateService;
-import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,9 +42,9 @@ import java.util.Objects;
  * <p>A Task consists of : -</p>
  * <ol><li>A <code>Task id</code> - String (that uniquely identifies a task within a task group).</li>
  * <li>The task contents (for example SQL code) held as a String.</li>
- * <li>An optional, Task specific configuration, ( as defined by {@link org.apache.commons.configuration2.Configuration}). Either
- * supplied via a <code>Configuration</code> class or loaded from the file system as an XML configuration file. The task specific
- * configuration can contain task dependency information and/or template parameters.
+ * <li>An optional, Task specific config, ( as defined by {@link org.apache.commons.configuration2.Configuration}). Either
+ * supplied via a <code>Configuration</code> class or loaded from the file system as an XML config file. The task specific
+ * config can contain task dependency information and/or template parameters.
  * </li>
  * </ol>
  * <p></p>
@@ -76,9 +75,9 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     private TaskResult result;
 
     /**
-     * The task configuration.
+     * The task config.
      */
-    private final CombinedConfiguration configuration;
+    private final Config config;
     /**
      * Template service provider.
      */
@@ -95,12 +94,23 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
-    protected BaseTask(String id, String task, TemplateService templateService, TaskExecutor taskExecutor) {
+    private BaseTask(String id, String task, TemplateService templateService, TaskExecutor taskExecutor) {
+        this(id,task, ConfigFactory.empty(),templateService,taskExecutor);
+    }
+
+    /**
+     * Construct a new Task with the given id and contents.
+     * @param id    task id.
+     * @param task  task contents.
+     * @param taskConfig The task specific config.
+     * @param templateService The template service provider.
+     * @param taskExecutor The task executor service responsible for executing tasks of this type.
+     */
+    protected BaseTask(String id, String task, Config taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
         super.setId(id);
         this.taskId = id;
         this.task = task;
-        this.configuration = new CombinedConfiguration();
-        this.configuration.addConfiguration(ConfigurationService.getConfiguration(), "global");
+        this.config = taskConfig.withFallback(new GlobalConfigurationProvider().getConfiguration());
         this.templateService = templateService;
         this.taskExecutor = taskExecutor;
         this.result = new TaskResult();
@@ -110,27 +120,12 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * Construct a new Task with the given id and contents.
      * @param id    task id.
      * @param task  task contents.
-     * @param taskConfig The task specific configuration.
+     * @param taskConfig Full path of XML file from which task specific config will be loaded.
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
-    protected BaseTask(String id, String task, @Nullable Configuration taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
-        this(id,task,templateService,taskExecutor);
-        if (taskConfig != null) this.configuration.addConfiguration(taskConfig, "task");
-    }
-
-    /**
-     * Construct a new Task with the given id and contents.
-     * @param id    task id.
-     * @param task  task contents.
-     * @param taskConfig Full path of XML file from which task specific configuration will be loaded.
-     * @param templateService The template service provider.
-     * @param taskExecutor The task executor service responsible for executing tasks of this type.
-     */
-    //@TODO Get rid of this constructor and dependancy on JobRunnerConfigurationProvider
-    protected BaseTask(String id, String task, String taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
-        this(id,task,templateService,taskExecutor);
-        this.configuration.addConfiguration(JobRunnerConfigurationProvider.getXmlConfig(taskConfig), "task");
+    private BaseTask(String id, String task, File taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
+        this(id,task,ConfigFactory.parseFile(taskConfig),templateService,taskExecutor);
     }
 
     @Override
@@ -160,7 +155,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      */
     public String getRenderedTaskContents() throws JobRunnerException {
         try {
-            return templateService.apply(getId(), getTaskContents(),getConfiguration());
+            return templateService.apply(getId(), getTaskContents(), getConfig());
         } catch (TemplateException e) {
             throw new JobRunnerException("Template error",e);
         }
@@ -174,12 +169,12 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     public TaskResult getTaskResult() { return result; }
 
     /**
-     * Return the (Combined) Configuration for this task.
+     * Return the Configuration for this task.
      *
-     * @return Configuration {@link org.apache.commons.configuration2.CombinedConfiguration}
+     * @return Config {@link com.typesafe.config.Config}
      */
-    public Configuration getConfiguration() {
-        return configuration;
+    private Config getConfig() {
+        return config;
     }
 
     /**
@@ -196,7 +191,8 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * @return The list of {@code taskIds} that this Task is dependent on. List returned can be empty.
      */
     public List<String> getDependencies() {
-        return getConfiguration().getList(String.class, TASK_DEPENDENCY_KEY, new ArrayList<>());
+        return getConfig().hasPath("depends-on.id") ? getConfig().getStringList("depends-on.id")
+                : Collections.emptyList();
     }
 
     /**
@@ -218,7 +214,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * <h3>{@code execute}</h3>
      *
-     * <p>Executes this task via a {@codeTaskExecutor}.</p>
+     * <p>Executes this task via a {@code TaskExecutor}.</p>
      *
      * @return set to {@code SUCCESSFUL} if execution successful, {@code FAILED} if error occurs.
      * @throws TaskExecutionException thrown when a execution problem is encountered.
@@ -226,8 +222,6 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     public TaskResult execute() throws TaskExecutionException {
         log.trace("About to execute task id: " + this.getId());
         setTaskResult(new TaskResult(TaskResult.Result.RUNNING));
-        //randomDelay(3,10);
-        //@TODO Set status to running.....
         try {
             taskExecutor.executeTask(this);
         } catch (JobRunnerException e) {
@@ -269,10 +263,6 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         return Objects.hash(taskId, task);
     }
 
-    /**
-     * The configuration key used to lookup task dependencies.
-     */
-    private static final String TASK_DEPENDENCY_KEY = ConfigurationService.getConfiguration().getString("dependency-key");
     /**
      * Logger
      */

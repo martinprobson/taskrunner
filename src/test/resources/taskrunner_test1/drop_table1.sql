@@ -1,2 +1,2 @@
 -- This is a syntax error
-DRP TABLE test1 ;
+DRP TABLE taskrunner_test1_test1 ;

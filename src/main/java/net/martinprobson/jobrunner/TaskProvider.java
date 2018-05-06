@@ -17,12 +17,12 @@
 package net.martinprobson.jobrunner;
 
 import com.google.inject.*;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationProvider;
-import org.apache.commons.configuration2.Configuration;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ import java.util.Optional;
  * modules.
  * <p>A {@code TaskProvider} internally holds a mapping between Task type (String)
  * and Task that it uses to validate and build new Tasks when requested via the
- * {@link TaskProvider#createTask(String, String, String, Configuration)}</p> methods.
+ * {@link TaskProvider#createTask(String, String, String, Config)}</p> methods.
  *  <p>The actual construction of the Task is handed off to a OldTaskFactory managed
  *  by Guice.</p>
  */
@@ -61,12 +61,11 @@ public class TaskProvider {
      * @param taskConfiguration (Optional) task specific configuration.
      * @return An {@code Optional<BaseTask>}
      * @throws JobRunnerException General error occurred.
-     * @throws TaskProviderMappingException If no mapping between file extension and {@code Task} can be found.
      */
     public Optional<BaseTask> fileExtensionCreateTask(String fileExtension,
                                                       String taskId,
                                                       String taskContent,
-                                                      Configuration taskConfiguration ) throws JobRunnerException {
+                                                      Config taskConfiguration ) throws JobRunnerException {
         String taskType = pluginConfig.fileExtensionMapping.get(fileExtension.toLowerCase());
         if (taskType == null)
             return Optional.empty();
@@ -88,7 +87,7 @@ public class TaskProvider {
      * @return A new Task of the type {@code taskType}
      * @throws JobRunnerException If the task type is unknown.
      */
-    public BaseTask createTask(String taskType, String taskId, String taskContent, @Nullable Configuration taskConfiguration ) throws JobRunnerException {
+    public BaseTask createTask(String taskType, String taskId, String taskContent, Config taskConfiguration ) throws JobRunnerException {
         TaskFactory taskFactory = taskMapping.get(taskType);
         if (taskFactory == null) {
             String sb = "Unknown task type - [" +
@@ -111,7 +110,7 @@ public class TaskProvider {
      * @throws JobRunnerException If the task type is unknown.
      */
     public BaseTask createTask(String taskType, String taskId, String taskContent) throws JobRunnerException {
-        return createTask(taskType,taskId,taskContent,null);
+        return createTask(taskType,taskId,taskContent,ConfigFactory.empty());
     }
 
     /**
@@ -125,7 +124,7 @@ public class TaskProvider {
      * modules.
      * <p>A {@code TaskProvider} internally holds a mapping between Task type (String)
      * and Task that it uses to validate and build new Tasks when requested via the
-     * {@link TaskProvider#createTask(String, String, String, Configuration)}</p> methods.
+     * {@link TaskProvider#createTask(String, String, String, Config)}</p> methods.
      *
      * @return A TaskProvider instance that can be used to construct tasks.
      */
@@ -147,7 +146,7 @@ public class TaskProvider {
     /**
      * A Map of known Tasks.
      */
-    private Map<String,TaskFactory> taskMapping;
+    private final Map<String,TaskFactory> taskMapping;
 
     /**
      * PluginTaskConfiguration - The Tasks and corresponding file extension mappings
@@ -155,7 +154,7 @@ public class TaskProvider {
      */
     private static PluginTaskConfiguration pluginConfig;
 
-    private static ConfigurationProvider<PluginTaskConfiguration> taskConfig = new PluginTaskConfigurationProvider();
+    private static final ConfigurationProvider<PluginTaskConfiguration> taskConfig = new PluginTaskConfigurationProvider();
 
     /**
      * The Mapping between task type (String) and a factory that can

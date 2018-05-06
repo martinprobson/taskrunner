@@ -1,17 +1,17 @@
 package net.martinprobson.jobrunner.template;
 
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static freemarker.template.Configuration.VERSION_2_3_28;
@@ -21,6 +21,7 @@ import static freemarker.template.Configuration.VERSION_2_3_28;
  */
 public class FreeMarkerTemplateService implements TemplateService {
 
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(FreeMarkerTemplateService.class);
     private static final freemarker.template.Configuration freeMarkerConfig;
 
@@ -33,14 +34,12 @@ public class FreeMarkerTemplateService implements TemplateService {
     }
 
     @Override
-    public String apply(String id, String content, Configuration configuration) throws net.martinprobson.jobrunner.template.TemplateException {
+    public String apply(String id, String content, Config configuration) throws net.martinprobson.jobrunner.template.TemplateException {
         String templatedContent;
-        Configuration sub =  configuration.subset("template");
-        Iterator<String> keys = sub.getKeys();
         Map<String,String> templateVars = new HashMap<>();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            templateVars.put(key,sub.getString(key));
+        if (configuration.hasPath("template")) {
+            for (Map.Entry<String, ConfigValue> m : configuration.getConfig("template").entrySet())
+                templateVars.put(m.getKey(), (String) m.getValue().unwrapped());
         }
         if (templateVars.isEmpty())
             templatedContent = content;

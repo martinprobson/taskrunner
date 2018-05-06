@@ -2,7 +2,6 @@ package net.martinprobson.jobrunner.monitor;
 
 import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import net.martinprobson.jobrunner.main.RunJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SimpleMonitor {
     private static final Logger log = LoggerFactory.getLogger(SimpleMonitor.class);
-    private Job job;
+    private final Job job;
     private final ScheduledExecutorService monitorService = Executors.newSingleThreadScheduledExecutor();
 
     public static SimpleMonitor getInstance(Job job) {
@@ -41,7 +40,6 @@ public class SimpleMonitor {
     }
 
     public static void main(String args[]) {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("reference_config.xml")));
         String testDir = new File(Objects.requireNonNull(RunJob.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
         try {
             Job job = new Job(LocalFileSystemTaskBuilder.create(testDir,testDir));
@@ -50,9 +48,7 @@ public class SimpleMonitor {
             TimeUnit.SECONDS.sleep(30);
             monitor.stop();
 
-        } catch (JobRunnerException e) {
-            log.error("Unexpected Exception: " + e);
-        } catch (InterruptedException e) {
+        } catch (JobRunnerException | InterruptedException e) {
             log.error("Unexpected Exception: " + e);
         }
     }

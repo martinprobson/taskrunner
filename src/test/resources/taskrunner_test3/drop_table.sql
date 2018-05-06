@@ -1,1 +1,1 @@
-DROP TABLE test3 ;
+DROP TABLE taskrunner_test3_test3 ;

@@ -3,7 +3,6 @@ package net.martinprobson.jobrunner.main;
 import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -36,7 +35,7 @@ public class RunJob {
      */
     public static void main(String args[]) {
         Args a = processCmdLine(args);
-        System.exit(run(a.taskDirectory,a.taskConfigDirectory,a.applicationConfig));
+        System.exit(run(a.taskDirectory,a.taskConfigDirectory));
     }
 
     /**
@@ -47,15 +46,13 @@ public class RunJob {
      *
      * @param taskDirectory The full path to directory on local filesystem holding tasks.
      * @param taskConfigDirectory The full path to directory containing task config file(s) (XML).
-     * @param appConfig One or more names of application XML config files.
      * @return 0 TaskGroup executed (see individual tasks for status).
      *         1 Error exception occurred.
      *
      * @author martinr
      *
      */
-    static int run(String taskDirectory, String taskConfigDirectory, String... appConfig) {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("reference_config.xml",appConfig)));
+    static int run(String taskDirectory, String taskConfigDirectory) {
 
         ExecutorService executorService = Executors.newFixedThreadPool(200);
         int rc = 0;
@@ -86,11 +83,6 @@ public class RunJob {
 
     private static Args processCmdLine(String args[]) {
         Options options = new Options();
-        Option conf = Option.builder("conf")
-                .argName("XML file")
-                .hasArg()
-                .desc("XML file for application level configuration.\nCan be specified multiple times.")
-                .build();
         Option taskConf = Option.builder("taskConf")
                 .argName("DIR")
                 .hasArg()
@@ -103,7 +95,6 @@ public class RunJob {
                 .build();
 
         options.addOption("help", false, "Display help");
-        options.addOption(conf);
         options.addOption(taskConf);
         options.addOption(tasks);
         CommandLineParser parser = new DefaultParser();
@@ -124,18 +115,6 @@ public class RunJob {
             h.printHelp("runjob", options);
             System.exit(0);
         }
-        if (cmd.hasOption("conf")) {
-            for (String file: cmd.getOptionValues("conf")) {
-                if (fileExists(file)) {
-                    System.err.println(file + " does not exist.");
-                    System.exit(2);
-                }
-            }
-        } else {
-            System.err.println("At least one global configuration file must be specified (-conf)");
-            System.exit(2);
-        }
-
         if (cmd.hasOption("taskConf")) {
             if (isDirectory(cmd.getOptionValue("taskConf"))) {
                 System.err.println("directory " + cmd.getOptionValue("taskConf") + " does not exist.");
@@ -156,7 +135,7 @@ public class RunJob {
             System.exit(2);
         }
 
-        return new Args(cmd.getOptionValues("conf"),cmd.getOptionValue("tasks"),cmd.getOptionValue("taskConf"));
+        return new Args(cmd.getOptionValue("tasks"),cmd.getOptionValue("taskConf"));
 
     }
 
@@ -169,12 +148,10 @@ public class RunJob {
     }
 
     private static class Args {
-        final String[] applicationConfig;
         final String taskDirectory;
         final String taskConfigDirectory;
 
-        Args(String[] applicationConfig, String taskDirectory, String taskConfigDirectory) {
-            this.applicationConfig = applicationConfig;
+        Args(String taskDirectory, String taskConfigDirectory) {
             this.taskDirectory = taskDirectory;
             this.taskConfigDirectory = taskConfigDirectory;
         }

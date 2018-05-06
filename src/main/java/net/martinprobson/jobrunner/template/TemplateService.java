@@ -1,7 +1,7 @@
 package net.martinprobson.jobrunner.template;
 
 
-import org.apache.commons.configuration2.Configuration;
+import com.typesafe.config.Config;
 
 /**
  * <h3><p>{@code TemplateService}</p></h3>
@@ -23,5 +23,5 @@ public interface TemplateService {
      * @return The content modified by the template.
      * @throws TemplateException if a field cannot be found or other template error occurs.
      */
-    String apply(String id, String content, Configuration configuration) throws TemplateException;
+    String apply(String id, String content, Config configuration) throws TemplateException;
 }

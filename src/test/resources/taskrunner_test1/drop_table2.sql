@@ -1,2 +1,2 @@
 -- This is a synatx error
-DRP TABLE test2;
+DRP TABLE taskrunner_test1_test2;

@@ -21,7 +21,6 @@ public class SparkScalaTaskModule extends AbstractModule {
     @Override
     public void configure() {
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
-
         mapBinder.addBinding("spark-scala").toProvider(FactoryProvider.newFactory(TaskFactory.class, SparkScalaTask.class));
 
         // JDBCTask needs a Task Executor and TemplateService implementation.

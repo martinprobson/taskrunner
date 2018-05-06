@@ -29,7 +29,7 @@ import javax.sql.DataSource;
  * <p>Handles the setup of a data source used in connection pool.</p>
  * <p></p>
  */
-public class DBSource {
+class DBSource {
 
     private static DataSource dataSource;
 

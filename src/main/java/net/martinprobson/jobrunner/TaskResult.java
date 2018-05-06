@@ -22,44 +22,33 @@ package net.martinprobson.jobrunner;
  * @author martinr
  */
 public class TaskResult {
-    public final Throwable exception;
+    private final Throwable exception;
     private final Result result;
-    private final String message;
 
     /**
      * Construct an empty TaskResult.
      */
     public TaskResult() {
-        this(Result.NOT_EXECUTED,"",null);
+        this(Result.NOT_EXECUTED,null);
     }
 
     /**
      * Construct a TaskResult with a result, message and exception.
      * @param result    The {@code Result} of the Task.
-     * @param message   Message returned.
-     * @param t         Exception returned by the task.
-     */
-    private TaskResult(Result result, String message, Throwable t) {
-        this.result = result;
-        this.message = message;
-        this.exception = t;
-    }
-
-    /**
-     * Construct a TaskResult with a result and exception.
-     * @param result    The {@code Result} of the Task.
      * @param t         Exception returned by the task.
      */
     public TaskResult(Result result, Throwable t) {
-        this(result, "", t);
+        this.result = result;
+        this.exception = t;
     }
+
 
     /**
      * Construct a TaskResult with a result and exception.
      * @param result    The {@code Result} of the Task.
      */
     public TaskResult(Result result) {
-        this(result, "", null);
+        this(result, null);
     }
 
     /**
@@ -82,8 +71,6 @@ public class TaskResult {
     public String toString() {
         StringBuilder sb = new StringBuilder("[ ");
         sb.append(result).append(" ");
-        if (message != null)
-            sb.append(message).append(" ");
         if (exception != null)
             sb.append(exception).append(" ").append(exception.getCause());
         sb.append("]");

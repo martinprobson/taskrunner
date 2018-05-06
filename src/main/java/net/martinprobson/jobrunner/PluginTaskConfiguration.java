@@ -18,7 +18,7 @@ import java.util.Map;
  *     the {@link TaskProvider}</li>
  * </ol>
 */
-class PluginTaskConfiguration {
+public class PluginTaskConfiguration {
     final Map<String,String> fileExtensionMapping;
     final List<? extends Module> pluginModules;
 

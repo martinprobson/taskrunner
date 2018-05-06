@@ -1,5 +1,6 @@
 package net.martinprobson.jobrunner.template;
 
+@SuppressWarnings("unused")
 public class TemplateException extends Exception {
 
     public TemplateException(final String msg) {

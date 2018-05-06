@@ -20,14 +20,13 @@ package net.martinprobson.jobrunner.jdbctask;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
+import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 
 /**
  * <p>{@code JDBCTask}</p>
@@ -53,7 +52,7 @@ class JDBCTask extends BaseTask {
                      @Named("jdbc") TaskExecutor jdbcTaskExecutor,
                      @Assisted("id") String id,
                      @Assisted("task") String task,
-                     @Assisted @Nullable Configuration taskConfiguration) {
+                     @Assisted Config taskConfiguration) {
         super(id,task,taskConfiguration,templateService,jdbcTaskExecutor);
         log.trace("Built a new JDBCTask: " + this);
     }

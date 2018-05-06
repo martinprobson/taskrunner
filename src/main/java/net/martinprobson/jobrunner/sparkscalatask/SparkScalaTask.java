@@ -20,14 +20,13 @@ package net.martinprobson.jobrunner.sparkscalatask;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
+import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 
 /**
  * <p>{@code SparkScalaTask}</p>
@@ -39,6 +38,7 @@ import javax.annotation.Nullable;
 class SparkScalaTask extends BaseTask {
 
     private static final Logger log = LoggerFactory.getLogger(SparkScalaTask.class);
+    @SuppressWarnings("unused")
     private static TaskExecutor taskExecutor = null;
 
     /**
@@ -54,7 +54,7 @@ class SparkScalaTask extends BaseTask {
                            @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
                            @Assisted("taskid")   String taskId,
                            @Assisted("content")  String content,
-                           @Assisted @Nullable Configuration taskConfiguration) {
+                           @Assisted Config taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
         log.trace("Built a new SparkScalaTask: " + this);
     }

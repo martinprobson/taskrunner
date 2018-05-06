@@ -16,8 +16,8 @@
  */
 package net.martinprobson.jobrunner.jdbctask;
 
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
-import org.apache.commons.configuration2.ImmutableConfiguration;
+import com.typesafe.config.Config;
+import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +37,11 @@ class Kerberos {
     private static final String KERBEROS_PASSWORD;
     private static final String KERBEROS_PRINCIPAL;
 
-    private static final ImmutableConfiguration CONFIG;
+    private static final Config CONFIG;
     private static final Logger log = LoggerFactory.getLogger(Kerberos.class);
 
     static {
-        CONFIG = ConfigurationService.getConfiguration();
+        CONFIG = new GlobalConfigurationProvider().getConfiguration();
         KERBEROS_USERNAME = CONFIG.getString("kerberos.username");
         KERBEROS_PASSWORD = CONFIG.getString("kerberos.password");
         KERBEROS_PRINCIPAL = CONFIG.getString("kerberos.principal");
@@ -49,7 +49,7 @@ class Kerberos {
     }
 
     public static void auth() {
-        if (KERBEROS_PRINCIPAL != null || KERBEROS_USERNAME != null || KERBEROS_PASSWORD != null)
+        if (!KERBEROS_PRINCIPAL.equals(""))
             auth_cmd();
     }
 

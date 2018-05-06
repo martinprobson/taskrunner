@@ -2,13 +2,11 @@ package net.martinprobson.jobrunner;
 
 import com.google.inject.Module;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigValue;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationProvider;
 import com.typesafe.config.ConfigFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <h2>{@code PluginTaskConfigurationProvider}</h2>
@@ -32,14 +30,14 @@ import java.util.Map;
  * </ul>
  * <p>The list of configured tasks is returned in a {@link PluginTaskConfiguration} object.</p>
  */
-class PluginTaskConfigurationProvider implements ConfigurationProvider<PluginTaskConfiguration> {
+public class PluginTaskConfigurationProvider implements ConfigurationProvider<PluginTaskConfiguration> {
     @Override
     public PluginTaskConfiguration getConfiguration() {
         Map<String,String> fileExtensionMapping = new HashMap<>();
         List<Module> modules = new ArrayList<>();
 
         Config conf = ConfigFactory.load();
-        for (Config c: conf.getConfigList("plugintasks.task")) {
+        for (Config c: conf.getConfigList("jobrunner.plugintasks.task")) {
             String name = c.getString("name");
             for (String extn: c.getStringList("file-extensions"))
                 fileExtensionMapping.put(extn,name);
@@ -55,13 +53,13 @@ class PluginTaskConfigurationProvider implements ConfigurationProvider<PluginTas
     }
 
     private static Module loadModule(String moduleClassName) throws TaskProviderMappingException {
-        Class clazz = null;
+        Class clazz;
         try {
             clazz = ClassLoader.getSystemClassLoader().loadClass(moduleClassName);
         } catch (ClassNotFoundException e) {
             throw new TaskProviderMappingException("Error when constructing class: " + moduleClassName,e);
         }
-        Module module = null;
+        Module module;
         if (Module.class.isAssignableFrom(clazz)) {
             try {
                 module = (Module) clazz.newInstance();
@@ -74,5 +72,13 @@ class PluginTaskConfigurationProvider implements ConfigurationProvider<PluginTas
                     Module.class.getSimpleName() + " interface.");
         }
         return module;
+    }
+
+    public static void main(String args[]) {
+        Config conf = ConfigFactory.load("martin.conf");
+        conf.getConfig("jobrunner.tempplate");
+        Set<Map.Entry<String, ConfigValue>> set = conf.entrySet();
+        for (Map.Entry<String, ConfigValue> m: set)
+            System.out.println(m.getKey() + ":" + m.getValue() );
     }
 }

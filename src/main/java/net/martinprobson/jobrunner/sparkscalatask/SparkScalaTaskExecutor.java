@@ -52,7 +52,7 @@ class SparkScalaTaskExecutor implements TaskExecutor {
         task.setTaskResult(new TaskResult(TaskResult.Result.SUCCESS));
     }
 
-    private static void execute(String script) throws JobRunnerException {
+    private static void execute(String script)  {
         log.trace("SparkScalaTaskExecutor - executeTask - " + script);
     }
 }

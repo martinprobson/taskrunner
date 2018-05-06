@@ -4,7 +4,6 @@ import com.github.dexecutor.core.task.TaskExecutionException;
 import net.martinprobson.jobrunner.*;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.junit.BeforeClass;
@@ -18,7 +17,6 @@ public class JDBCTaskTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
         taskProvider = TaskProvider.getInstance();
     }
 
@@ -55,7 +53,6 @@ public class JDBCTaskTest {
     }
 
     @Test
-    //@TODO For POC
     public void TestExecuteSelect() throws JobRunnerException {
         StringBuilder sb = new StringBuilder("create table bar (foo varchar(1));");
         sb.append("insert into bar values ('1');");
@@ -71,7 +68,7 @@ public class JDBCTaskTest {
     public void equalsContract() {
         EqualsVerifier.forClass(JDBCTask.class)
                 .usingGetClass()
-                .withIgnoredFields("taskExecutor","configuration","id","considerExecutionError","result","templateService")
+                .withIgnoredFields("taskExecutor","config","id","considerExecutionError","result","templateService")
                 .withPrefabValues(CombinedConfiguration.class,new CombinedConfiguration(),new CombinedConfiguration())
                 .verify();
     }

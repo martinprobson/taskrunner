@@ -3,7 +3,6 @@ package net.martinprobson.jobrunner;
 import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,8 +83,6 @@ public class JobRunnerTest {
 
     @Before
     public void setUp() throws Exception {
-        // Wire up our configuration to our global configuration service.
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
         expectedResults = getExpectedResults(testDir);
         System.out.println(expectedResults);
     }

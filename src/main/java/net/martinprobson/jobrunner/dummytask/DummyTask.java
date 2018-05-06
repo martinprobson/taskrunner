@@ -16,15 +16,14 @@
  */
 package net.martinprobson.jobrunner.dummytask;
 
-import javax.annotation.Nullable;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.google.inject.name.Named;
+import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ class DummyTask extends BaseTask {
     @AssistedInject
     private DummyTask(  @Assisted("id") String id,
                         @Assisted("task") String task,
-                        @Assisted @Nullable Configuration taskConfiguration,
+                        @Assisted Config taskConfiguration,
                         TemplateService templateService,
                         @Named("dummy") TaskExecutor taskExecutor) {
         super(id,task,taskConfiguration,templateService,taskExecutor);

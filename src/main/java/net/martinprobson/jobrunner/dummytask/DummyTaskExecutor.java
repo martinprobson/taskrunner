@@ -1,7 +1,6 @@
 package net.martinprobson.jobrunner.dummytask;
 
 import net.martinprobson.jobrunner.common.BaseTask;
-import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.TaskResult;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
 class DummyTaskExecutor implements TaskExecutor {
 
     @Override
-    public void executeTask(BaseTask task) throws JobRunnerException {
+    public void executeTask(BaseTask task)  {
         log.trace("DummyTaskExecutor - executeTask - " + task.getId());
         task.setTaskResult(new TaskResult(TaskResult.Result.SUCCESS));
     }

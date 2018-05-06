@@ -18,12 +18,6 @@ package net.martinprobson.jobrunner;
 
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -32,23 +26,8 @@ import java.util.Map;
  *
  * @author martinr
  */
-public interface TaskBuilder {
+interface TaskBuilder {
 
     Map<String, BaseTask> build() throws JobRunnerException;
 
-    static XMLConfiguration getConfig(String fileName) {
-        Logger log = LoggerFactory.getLogger(TaskBuilder.class);
-        XMLConfiguration config = null;
-        FileBasedConfigurationBuilder<XMLConfiguration> builder =
-                new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
-                        .configure(new Parameters().xml().setFileName(fileName));
-        try {
-            config = builder.getConfiguration();
-        } catch (ConfigurationException cex) {
-            log.error("Loading of configuration failed", cex);
-            System.exit(2);
-        }
-        log.debug("Loaded configuration file: " + fileName);
-        return config;
-    }
 }

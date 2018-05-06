@@ -3,7 +3,6 @@ package net.martinprobson.jobrunner;
 import com.github.dexecutor.core.task.Task;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.configurationservice.ConfigurationService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,14 +21,12 @@ public class JobTest {
         HashMap<String, BaseTask> tasks = new HashMap<>();
         String taskNames[] = {"t1", "t2", "t3", "t4","t5","t6","t7"};
         for (String task : taskNames)
-            //@TODO Fix
             tasks.put(task, taskProvider.createTask("dummy",task,""));
         return tasks;
     }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        ConfigurationService.load(new ConfigurationService(new JobRunnerConfigurationProvider("test_global_config.xml")));
         taskProvider = TaskProvider.getInstance();
         job = new Job( () -> getTasks() );
         expectedTasks = getTasks();

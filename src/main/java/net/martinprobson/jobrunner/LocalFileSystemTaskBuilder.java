@@ -16,9 +16,11 @@
  */
 package net.martinprobson.jobrunner;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigParseOptions;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -38,11 +40,12 @@ import java.util.Map;
 public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
     private static TaskProvider taskProvider;
-    private String taskDirectory;
+    private final String taskDirectory;
+    private final String configDirectory;
 
     private LocalFileSystemTaskBuilder(String taskDirectory, String configDirectory) {
         this.taskDirectory = taskDirectory;
-        String configDirectory1 = configDirectory;
+        this.configDirectory = configDirectory;
     }
 
     public static LocalFileSystemTaskBuilder create(String taskDirectory,
@@ -59,7 +62,7 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
 
     /**
      * <p>Given a filename of the form {@code file.<ext>}
-     * attempt to find a corresponding <code>file.xml</code> file
+     * attempt to find a corresponding <code>file.conf</code> file
      * in the same directory.</p>
      * <p>If found, then load the task specific configuration from
      * the file.</p>
@@ -67,23 +70,19 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
      *
      * @param directory - The directory to search.
      * @param file      - The name of the file.
-     * @return - An {@code XMLConfiguration}.
+     * @return - A {@code Config}.
      */
-    private static XMLConfiguration getTaskConfiguration(File directory, String file) {
+    private static Config getTaskConfiguration(File directory, String file) {
         String configName = directory.getAbsolutePath() +
                 File.separatorChar +
-                FilenameUtils.getBaseName(file) +
-                ".xml";
+                FilenameUtils.getBaseName(file);
         File configFile = new File(configName);
-        if (configFile.exists() && configFile.isFile())
-            return TaskBuilder.getConfig(configFile.getAbsolutePath());
-        else
-            return new XMLConfiguration();
+        return ConfigFactory.parseFileAnySyntax(configFile,ConfigParseOptions.defaults().setAllowMissing(true));
     }
 
     /**
      * @return A collection of Tasks built from specific base directory.
-     * @throws JobRunnerException
+     * @throws JobRunnerException If files cannot be read or mapping failure
      */
     @Override
     public Map<String, BaseTask> build() throws JobRunnerException {
@@ -101,7 +100,7 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
                 } catch (IOException e) {
                     throw new JobRunnerException("Error reading file: " + file, e);
                 }
-                XMLConfiguration taskConfig = getTaskConfiguration(testDirectory, taskFile);
+                Config taskConfig = getTaskConfiguration(new File(configDirectory), taskFile);
                 BaseTask task = taskProvider.fileExtensionCreateTask("." + fileExtension,
                         taskFile,
                         contents,
