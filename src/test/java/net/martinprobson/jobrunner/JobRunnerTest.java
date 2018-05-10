@@ -66,7 +66,7 @@ public class JobRunnerTest {
                 {  11, "taskrunner_test6",Executors.newFixedThreadPool(2)},
                 {  12, "taskrunner_test7",Executors.newSingleThreadExecutor()},
                 {  13, "taskrunner_test7",Executors.newFixedThreadPool(2)},
-
+                {  14, "taskrunner_test8",Executors.newFixedThreadPool(2)},
         });
     }
 

@@ -173,7 +173,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      *
      * @return Config {@link com.typesafe.config.Config}
      */
-    private Config getConfig() {
+    public Config getConfig() {
         return config;
     }
 

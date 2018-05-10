@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<configuration>
-    <!-- This is the XML node used to lookup task dependencies in the task configuration -->
-    <dependency-key>
-        depends-on.id
-    </dependency-key>
-</configuration>
- 
-

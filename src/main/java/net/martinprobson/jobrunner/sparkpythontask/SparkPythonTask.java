@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package net.martinprobson.jobrunner.sparkscalatask;
+package net.martinprobson.jobrunner.sparkpythontask;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -29,34 +29,34 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * <p>{@code SparkScalaTask}</p>
+ * <p>{@code SparkPythonTask}</p>
  *
- * <p>A task that holds Spark Scala script code that will be executed in Spark via {@code Spark-shell}.</p>
+ * <p>A task that holds Spark Python code that will be executed in Spark via {@code Spark-submit}.</p>
  *
  * @author martinr
  */
-class SparkScalaTask extends BaseTask {
+class SparkPythonTask extends BaseTask {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkScalaTask.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkPythonTask.class);
     @SuppressWarnings("unused")
     private static TaskExecutor taskExecutor = null;
 
     /**
      *
-     * Creates a SparkScalaTask with the specified id,scala code and task configuration.
+     * Creates a SparkPythonTask with the specified id,python code and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Spark Scala script code to run.
+     * @param content            Spark python script code to run.
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
-    private SparkScalaTask(TemplateService templateService,
-                           @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
-                           @Assisted("taskid")   String taskId,
-                           @Assisted("content")  String content,
-                           @Assisted Config taskConfiguration) {
+    private SparkPythonTask(TemplateService templateService,
+                            @Named("spark-python") TaskExecutor jdbcTaskExecutor,
+                            @Assisted("taskid")   String taskId,
+                            @Assisted("content")  String content,
+                            @Assisted Config taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new SparkScalaTask: " + this);
+        log.trace("Built a new SparkPythonTask: " + this);
     }
 
 }
