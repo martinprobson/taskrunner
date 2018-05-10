@@ -35,6 +35,7 @@ import java.util.Map;
  * <p>{@code SparkPythonTaskExecutor}</p>
  *
  * <p>Responsible for executing Python Spark code via a Spark connection.</p>
+ * <p>Code is executed via {@code spark-submit}</p>
  *
  * @author martinr
  */
