@@ -55,7 +55,7 @@ public class PluginTaskConfigurationProvider implements ConfigurationProvider<Pl
     private static Module loadModule(String moduleClassName) throws TaskProviderMappingException {
         Class clazz;
         try {
-            clazz = ClassLoader.getSystemClassLoader().loadClass(moduleClassName);
+            clazz = PluginTaskConfigurationProvider.class.getClassLoader().loadClass(moduleClassName);
         } catch (ClassNotFoundException e) {
             throw new TaskProviderMappingException("Error when constructing class: " + moduleClassName,e);
         }

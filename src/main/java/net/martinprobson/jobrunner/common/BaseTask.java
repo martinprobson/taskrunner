@@ -42,8 +42,8 @@ import java.util.Objects;
  * <p>A Task consists of : -</p>
  * <ol><li>A <code>Task id</code> - String (that uniquely identifies a task within a task group).</li>
  * <li>The task contents (for example SQL code) held as a String.</li>
- * <li>An optional, Task specific config, ( as defined by {@link org.apache.commons.configuration2.Configuration}). Either
- * supplied via a <code>Configuration</code> class or loaded from the file system as an XML config file. The task specific
+ * <li>An optional, Task specific config. Either
+ * supplied via a <code>Config</code> class or loaded from the file system as a config file. The task specific
  * config can contain task dependency information and/or template parameters.
  * </li>
  * </ol>
@@ -110,17 +110,18 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         super.setId(id);
         this.taskId = id;
         this.task = task;
-        this.config = taskConfig.withFallback(new GlobalConfigurationProvider().getConfiguration());
+        this.config = taskConfig.withFallback(GlobalConfigurationProvider.get().getConfiguration());
         this.templateService = templateService;
         this.taskExecutor = taskExecutor;
         this.result = new TaskResult();
+        log.trace("Built a new " + this.getClass() + " - " + this.getId());
     }
 
     /**
      * Construct a new Task with the given id and contents.
      * @param id    task id.
      * @param task  task contents.
-     * @param taskConfig Full path of XML file from which task specific config will be loaded.
+     * @param taskConfig File from which task specific config will be loaded.
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
@@ -224,7 +225,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         setTaskResult(new TaskResult(TaskResult.Result.RUNNING));
         try {
             taskExecutor.executeTask(this);
-        } catch (JobRunnerException e) {
+        } catch (Exception e) {
             setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
             throw new TaskExecutionException("Task: " + getId() + " failed with " + e.getMessage(),e);
         }

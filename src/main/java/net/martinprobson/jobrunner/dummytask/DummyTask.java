@@ -43,7 +43,6 @@ class DummyTask extends BaseTask {
                         TemplateService templateService,
                         @Named("dummy") TaskExecutor taskExecutor) {
         super(id,task,taskConfiguration,templateService,taskExecutor);
-        log.trace("Built a new DummyTask: " + this);
     }
 
 }

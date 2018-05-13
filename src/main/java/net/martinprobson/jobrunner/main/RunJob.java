@@ -1,11 +1,19 @@
 package net.martinprobson.jobrunner.main;
 
 import com.github.dexecutor.core.ExecutionConfig;
-import net.martinprobson.jobrunner.*;
+import net.martinprobson.jobrunner.Job;
+import net.martinprobson.jobrunner.JobRunner;
+import net.martinprobson.jobrunner.JobRunnerConfig;
+import net.martinprobson.jobrunner.LocalFileSystemTaskBuilder;
 import net.martinprobson.jobrunner.common.JobRunnerException;
+import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import org.apache.commons.cli.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -13,52 +21,92 @@ import java.util.concurrent.TimeUnit;
 public class RunJob {
 
     /**
-     *  <h3>{@code RunJob.main}</h3>
-     *  <p>Main command line entry point for the RunJob application.</p>
-     *  <p>Run a group of related tasks according to specifications passed in via the
-     *  following command line: -</p>
-     *  <p>
+     * Logger
+     */
+    private static final Logger log = LoggerFactory.getLogger(RunJob.class);
+    private static Job job;
+
+    private RunJob() {
+    }
+
+    /**
+     * <h3>{@code RunJob.main}</h3>
+     * <p>Main command line entry point for the RunJob application.</p>
+     * <p>Run a group of related tasks according to specifications passed in via the
+     * following command line: -</p>
+     * <p>
      *
-     *  </p>
+     * </p>
      * <blockquote><pre>{@code
      *  usage: runjob
-     *      -conf <XML file>    XML file for application level configuration.
-     *                          Can be specified multiple times.
      *      -help               Display help
-     *      -taskConf <DIR>     Directory containing task specific configuration
+     *      -conf <DIR>         Directory containing application and task specific configuration
      *                          files.
      *      -tasks <DIR>        Directory containing tasks to be run.}
      * </pre></blockquote>
      *
      * @author martinr
-     *
      */
     public static void main(String args[]) {
         Args a = processCmdLine(args);
-        System.exit(run(a.taskDirectory,a.taskConfigDirectory));
+        int rc;
+        if (a.renderTask)
+            rc = render(a);
+        else
+            rc = run(a.taskDirectory, a.configDirectory);
+        System.exit(rc);
     }
 
     /**
-     *  <h3>{@code RunJob.run}</h3>
-     *  <p>Main entry point for the RunJob application.</p>
-     *  <p>Run a group of related tasks according to specifications passed in via the
-     *  following: -</p>
+     * <h3>{@code RunJob.run}</h3>
+     * <p>Main entry point for the RunJob application.</p>
+     * <p>Run a group of related tasks according to specifications passed in via the
+     * following: -</p>
      *
-     * @param taskDirectory The full path to directory on local filesystem holding tasks.
-     * @param taskConfigDirectory The full path to directory containing task config file(s) (XML).
-     * @return 0 TaskGroup executed (see individual tasks for status).
-     *         1 Error exception occurred.
-     *
+     * @param args Config/task and task id to render.
+     * @return 0 Task rendered successfully.
+     * 1 Error exception occurred.
      * @author martinr
-     *
      */
-    static int run(String taskDirectory, String taskConfigDirectory) {
+    static int render(Args args) {
+        // Initialize out global configuration.
+        initializeGlobalConfig(args.configDirectory);
+        int rc = 0;
+        try {
+            job = new Job(LocalFileSystemTaskBuilder.create(args.taskDirectory, args.configDirectory));
+            if (job.hasId(args.renderTaskId)) {
+                System.out.println(job.getId(args.renderTaskId).getRenderedTaskContents());
+            } else
+                throw new JobRunnerException("TaskId: " + args.renderTaskId + " does not exist");
 
+        } catch (JobRunnerException e) {
+            System.err.println("Exception: " + e);
+            rc = 2;
+        }
+        return rc;
+    }
+
+    /**
+     * <h3>{@code RunJob.run}</h3>
+     * <p>Main entry point for the RunJob application.</p>
+     * <p>Run a group of related tasks according to specifications passed in via the
+     * following: -</p>
+     *
+     * @param taskDirectory   The full path to directory on local filesystem holding tasks.
+     * @param configDirectory The full path to directory containing application/task config file(s).
+     * @return 0 TaskGroup executed (see individual tasks for status).
+     * 1 Error exception occurred.
+     * @author martinr
+     */
+    static int run(String taskDirectory, String configDirectory) {
+
+        // Initialize out global configuration.
+        initializeGlobalConfig(configDirectory);
         ExecutorService executorService = Executors.newFixedThreadPool(200);
         int rc = 0;
         JobRunnerConfig config;
         try {
-            job = new Job(LocalFileSystemTaskBuilder.create(taskDirectory,taskConfigDirectory));
+            job = new Job(LocalFileSystemTaskBuilder.create(taskDirectory, configDirectory));
             config = new JobRunnerConfig(executorService, job);
             JobRunner jobRunner = new JobRunner(config);
             jobRunner.execute(ExecutionConfig.NON_TERMINATING);
@@ -81,22 +129,41 @@ public class RunJob {
         return job;
     }
 
+    private static void initializeGlobalConfig(String configDirectory) {
+        String appConfigFilename;
+        if (configDirectory.endsWith(File.separator))
+            appConfigFilename = configDirectory + "applicaction.conf";
+        else
+            appConfigFilename = configDirectory + File.separator + "application.conf";
+        if (!Files.exists(Paths.get(appConfigFilename))) {
+            log.warn("No global application file, " + appConfigFilename + " exists using default config");
+            GlobalConfigurationProvider.get();
+        } else
+            GlobalConfigurationProvider.setConfig(new File(appConfigFilename));
+    }
+
     private static Args processCmdLine(String args[]) {
         Options options = new Options();
-        Option taskConf = Option.builder("taskConf")
+        Option confDir = Option.builder("conf")
                 .argName("DIR")
                 .hasArg()
-                .desc("Directory containing task specific configuration files.")
+                .required()
+                .desc("Directory containing application/task specific configuration files.")
                 .build();
         Option tasks = Option.builder("tasks")
                 .argName("DIR")
                 .hasArg()
+                .required()
                 .desc("Directory containing tasks to be run.")
                 .build();
-
-        options.addOption("help", false, "Display help");
-        options.addOption(taskConf);
-        options.addOption(tasks);
+        Option render = Option.builder("render")
+                .argName("taskId")
+                .hasArg()
+                .optionalArg(true)
+                .desc("Render the given taskId to stdout")
+                .build();
+        options.addOption("help", false, "Display help")
+                .addOption(confDir).addOption(tasks).addOption(render);
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
@@ -113,51 +180,36 @@ public class RunJob {
         if (cmd.hasOption("help")) {
             HelpFormatter h = new HelpFormatter();
             h.printHelp("runjob", options);
-            System.exit(0);
+            System.exit(2);
         }
-        if (cmd.hasOption("taskConf")) {
-            if (isDirectory(cmd.getOptionValue("taskConf"))) {
-                System.err.println("directory " + cmd.getOptionValue("taskConf") + " does not exist.");
-                System.exit(2);
-            }
-        } else {
-            System.err.println("Task configuration directory must be specified (-taskConf)");
+        if (!Files.isDirectory(Paths.get(cmd.getOptionValue("conf")))) {
+            System.err.println("directory " + cmd.getOptionValue("conf") + " does not exist.");
             System.exit(2);
         }
 
-        if (cmd.hasOption("tasks")) {
-            if (isDirectory(cmd.getOptionValue("tasks"))) {
-                System.err.println("directory " + cmd.getOptionValue("tasks") + " does not exist.");
-                System.exit(2);
-            }
-        } else {
-            System.err.println("Tasks directory must be specified (-tasks)");
+        if (!Files.isDirectory(Paths.get(cmd.getOptionValue("tasks")))) {
+            System.err.println("directory " + cmd.getOptionValue("tasks") + " does not exist.");
             System.exit(2);
         }
 
-        return new Args(cmd.getOptionValue("tasks"),cmd.getOptionValue("taskConf"));
+        return new Args(cmd.getOptionValue("tasks"),
+                cmd.getOptionValue("conf"),
+                cmd.hasOption("render"),
+                cmd.getOptionValue("render"));
 
-    }
-
-    private static boolean fileExists(String file) {
-        return !new File(file).exists();
-    }
-
-    private static boolean isDirectory(String directory) {
-        return fileExists(directory) || !new File(directory).isDirectory();
     }
 
     private static class Args {
         final String taskDirectory;
-        final String taskConfigDirectory;
+        final String configDirectory;
+        final boolean renderTask;
+        final String renderTaskId;
 
-        Args(String taskDirectory, String taskConfigDirectory) {
+        Args(String taskDirectory, String configDirectory, boolean renderTask, String renderTaskId) {
             this.taskDirectory = taskDirectory;
-            this.taskConfigDirectory = taskConfigDirectory;
+            this.configDirectory = configDirectory;
+            this.renderTask = renderTask;
+            this.renderTaskId = renderTaskId;
         }
     }
-
-    private static Job job;
-    private RunJob() {}
-
 }

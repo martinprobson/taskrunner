@@ -56,7 +56,6 @@ class SparkPythonTask extends BaseTask {
                             @Assisted("content")  String content,
                             @Assisted Config taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new SparkPythonTask: " + this);
     }
 
 }

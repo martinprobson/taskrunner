@@ -81,12 +81,12 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("\n");
         for (BaseTask task : this) {
             sb.append("id: [")
                     .append(task.getId())
-                    .append("] Task Status: [")
-                    .append(task.getTaskResult().getResult())
+                    .append("]\n\t Task Status: [")
+                    .append(task.getTaskResult())
                     .append("]\n");
         }
         return sb.toString();

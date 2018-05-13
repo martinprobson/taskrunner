@@ -26,7 +26,7 @@ public class SimpleMonitor {
     }
 
     private void monitor() {
-        log.info(job.toString());
+        System.out.println(job.toString());
     }
 
     public void start() {

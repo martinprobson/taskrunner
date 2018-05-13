@@ -3,6 +3,7 @@ package net.martinprobson.jobrunner;
 import com.github.dexecutor.core.ExecutionConfig;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
+import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +67,6 @@ public class JobRunnerTest {
                 {  11, "taskrunner_test6",Executors.newFixedThreadPool(2)},
                 {  12, "taskrunner_test7",Executors.newSingleThreadExecutor()},
                 {  13, "taskrunner_test7",Executors.newFixedThreadPool(2)},
-                {  14, "taskrunner_test8",Executors.newFixedThreadPool(2)},
         });
     }
 

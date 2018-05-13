@@ -47,7 +47,7 @@ class DBConnection implements ConnectionFactory {
     private static final Logger log = LoggerFactory.getLogger(DBConnection.class);
 
     static {
-        Config cfg = new GlobalConfigurationProvider().getConfiguration();
+        Config cfg = GlobalConfigurationProvider.get().getConfiguration();
         JDBC_USERNAME = cfg.getString("jdbc.username");
         JDBC_PASSWORD = cfg.getString("jdbc.password");
         JDBC_DRIVER_CLASSNAME = cfg.getString("jdbc.driver");

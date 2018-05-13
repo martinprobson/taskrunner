@@ -41,7 +41,7 @@ class Kerberos {
     private static final Logger log = LoggerFactory.getLogger(Kerberos.class);
 
     static {
-        CONFIG = new GlobalConfigurationProvider().getConfiguration();
+        CONFIG = GlobalConfigurationProvider.get().getConfiguration();
         KERBEROS_USERNAME = CONFIG.getString("kerberos.username");
         KERBEROS_PASSWORD = CONFIG.getString("kerberos.password");
         KERBEROS_PRINCIPAL = CONFIG.getString("kerberos.principal");

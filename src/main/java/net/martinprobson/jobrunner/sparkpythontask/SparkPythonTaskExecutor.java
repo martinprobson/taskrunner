@@ -81,31 +81,31 @@ class SparkPythonTaskExecutor implements TaskExecutor {
     }
 
     private void execute(BaseTask task) throws JobRunnerException {
-        log.trace("SparkPythonTaskExecutor - executeTask");
-        checkSparkEnv();
-        Map map = new HashMap();
-        map.put("file", createTempFile(task.getRenderedTaskContents()));
-        CommandLine cmdLine = CommandLine.parse(System.getenv("SPARK_HOME") + File.separatorChar + "bin" + File.separatorChar + "spark-submit");
-        cmdLine.setSubstitutionMap(map);
-        cmdLine.addArgument("--master").addArgument(task.getConfig().getString("spark-python.master"));
-        cmdLine.addArgument("--num-executors").addArgument(task.getConfig().getString("spark-python.num-executors"));
-        cmdLine.addArgument("--queue").addArgument(task.getConfig().getString("spark-python.queue"));
-        cmdLine.addArgument("${file}");
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setExitValue(0);
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
-        executor.setWatchdog(watchdog);
-        int exitValue;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         ByteArrayOutputStream error = new ByteArrayOutputStream();
+        int exitValue;
         try {
+            log.trace("SparkPythonTaskExecutor - executeTask");
+            checkSparkEnv();
+            Map map = new HashMap();
+            map.put("file", createTempFile(task.getRenderedTaskContents()));
+            CommandLine cmdLine = CommandLine.parse(System.getenv("SPARK_HOME") + File.separatorChar + "bin" + File.separatorChar + "spark-submit");
+            cmdLine.setSubstitutionMap(map);
+            cmdLine.addArgument("--master").addArgument(task.getConfig().getString("spark-python.master"));
+            cmdLine.addArgument("--num-executors").addArgument(task.getConfig().getString("spark-python.num-executors"));
+            cmdLine.addArgument("--queue").addArgument(task.getConfig().getString("spark-python.queue"));
+            cmdLine.addArgument("${file}");
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setExitValue(0);
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(60000);
+            executor.setWatchdog(watchdog);
             log.trace("About to execute: " + cmdLine);
-            PumpStreamHandler streamHandler = new PumpStreamHandler(output,error);
+            PumpStreamHandler streamHandler = new PumpStreamHandler(output, error);
 
             executor.setStreamHandler(streamHandler);
             exitValue = executor.execute(cmdLine);
-        } catch (IOException e) {
-            throw new JobRunnerException("Execute error: stdout = [" + output + "] stderr = [" + error + "]");
+        } catch (Exception e) {
+            throw new JobRunnerException("Execute error: stdout = [" + output + "] stderr = [" + error + "]",e);
         }
         if (exitValue != 0)
             throw new JobRunnerException("Non-zero exit value: stdout = [" + output + "] stderr = [" + error + "]");

@@ -22,4 +22,5 @@ index-files
 /lib/
 /doc
 /target
+dependency-reduced-pom.xml
 .settings/

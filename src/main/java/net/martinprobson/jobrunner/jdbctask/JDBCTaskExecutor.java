@@ -48,15 +48,20 @@ class JDBCTaskExecutor implements TaskExecutor {
      * {@link DBSource}
      * </p>
      *
-     * @param sqlStmts String containing SQL statement(s) to be run.
+     * @param script String containing SQL statement(s) to be run.
      * @throws JobRunnerException on execution error.
      */
-    private static void ExecuteSqlStmts(String sqlStmts) throws JobRunnerException {
+    private static void ExecuteSqlStmts(String script) throws JobRunnerException {
         try (Connection conn = DBSource.get().getConnection()) {
-            List<String> stmts = SQLSplit(sqlStmts);
-            log.trace("String contains  " + stmts.size() + " statement(s)");
-            for (String stmt : stmts)
-                ExecSQL(conn,stmt);
+            Kerberos.auth();
+            List<String> sqlStmts = SQLSplit(script);
+            log.trace("String contains  " + sqlStmts.size() + " statement(s)");
+            try (Statement stmt = conn.createStatement()) {
+                for (String sql : sqlStmts) {
+                    log.debug("About to execute statement: " + sql);
+                    stmt.execute(sql);
+                }
+            }
         } catch (SQLException e) {
             throw new JobRunnerException("SQLException", e);
         }
@@ -101,23 +106,6 @@ class JDBCTaskExecutor implements TaskExecutor {
             result.append(s).append(" ");
         }
         return result.toString();
-    }
-
-    /**
-     * Execute single SQL statement.
-     * <p></p>
-     *
-     * @param conn    - JDBC DB Connection to run against.
-     * @param sqlStmt - SQL statement to execute.
-     * @throws SQLException If the statement caused an error.
-     */
-    private static void ExecSQL(Connection conn, String sqlStmt) throws SQLException {
-
-        Kerberos.auth();
-        try (Statement stmt = conn.createStatement()) {
-            log.debug("About to execute statement: " + sqlStmt);
-            stmt.execute(sqlStmt);
-        }
     }
 
     /**

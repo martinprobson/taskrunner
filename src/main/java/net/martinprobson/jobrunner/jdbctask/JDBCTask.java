@@ -54,6 +54,5 @@ class JDBCTask extends BaseTask {
                      @Assisted("task") String task,
                      @Assisted Config taskConfiguration) {
         super(id,task,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new JDBCTask: " + this);
     }
 }

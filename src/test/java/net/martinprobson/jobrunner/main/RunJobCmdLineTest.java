@@ -25,41 +25,15 @@ public class RunJobCmdLineTest {
 
     @Test
     public void testHelpOption() {
-        exit.expectSystemExitWithStatus(0);
+        exit.expectSystemExitWithStatus(2);
         exit.checkAssertionAfterwards(() -> {
-            assertThat(systemOutRule.getLog(),containsString("-taskConf"));
+            assertThat(systemOutRule.getLog(),containsString("-conf"));
             assertThat(systemOutRule.getLog(),containsString("-tasks"));
+            assertThat(systemOutRule.getLog(),containsString("-render"));
             assertThat(systemOutRule.getLog(),containsString("-help"));
             assertThat(systemOutRule.getLog(),containsString("usage: runjob"));
-            assertEquals(systemErrRule.getLog(),"");
         });
         String[] args = {"-help"};
-        RunJob.main(args);
-    }
-
-    @Test
-    public void testMissingTaskConf() {
-        exit.expectSystemExitWithStatus(2);
-        exit.checkAssertionAfterwards(() -> {
-            assertThat(systemErrRule.getLog(),containsString("Task configuration directory must be specified"));
-            assertEquals(systemOutRule.getLog(),"");
-        });
-        String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-
-        String[] args = {"-tasks","test1"};
-        RunJob.main(args);
-    }
-
-    @Test
-    public void testMissingTask() {
-        exit.expectSystemExitWithStatus(2);
-        exit.checkAssertionAfterwards(() -> {
-            assertThat(systemErrRule.getLog(),containsString("Tasks directory must be specified"));
-            assertEquals(systemOutRule.getLog(),"");
-        });
-        String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
-
-        String[] args = {"-taskConf",test1};
         RunJob.main(args);
     }
 
@@ -70,14 +44,14 @@ public class RunJobCmdLineTest {
             assertThat(systemErrRule.getLog(),containsString("directory foo does not exist"));
             assertEquals(systemOutRule.getLog(),"");
         });
-        String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
+        String test1 = Paths.get("src","test","resources","taskrunner_test1").toFile().getAbsolutePath();
 
-        String[] args = {"-taskConf",test1,"-tasks","foo"};
+        String[] args = {"-conf",test1,"-tasks","foo"};
         RunJob.main(args);
     }
 
     @Test
-    public void testInvalidTaskConf() {
+    public void testInvalidConf() {
         exit.expectSystemExitWithStatus(2);
         exit.checkAssertionAfterwards(() -> {
             assertThat(systemErrRule.getLog(),containsString("directory foo does not exist"));
@@ -85,7 +59,7 @@ public class RunJobCmdLineTest {
         });
         String test1 = Paths.get("src","test","resources","runjob_test1","tasks").toFile().getAbsolutePath();
 
-        String[] args = {"-taskConf","foo","-tasks",test1};
+        String[] args = {"-conf","foo","-tasks",test1};
         RunJob.main(args);
     }
 
@@ -94,7 +68,7 @@ public class RunJobCmdLineTest {
         exit.expectSystemExitWithStatus(2);
         exit.checkAssertionAfterwards(() -> {
             assertThat(systemErrRule.getLog(),containsString("Unrecognized option: -foo"));
-            assertThat(systemOutRule.getLog(),containsString("-taskConf"));
+            assertThat(systemOutRule.getLog(),containsString("-conf"));
             assertThat(systemOutRule.getLog(),containsString("-tasks"));
             assertThat(systemOutRule.getLog(),containsString("-help"));
             assertThat(systemOutRule.getLog(),containsString("usage: runjob"));
