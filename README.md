@@ -15,9 +15,9 @@
     - JDBC - SQL code that can be run against a standard JDBC connection. File extension `.sql`.
     - Hive HQL -  [Apache Hive HQL](https://cwiki.apache.org/confluence/display/Hive/LanguageManual) run using the Hive CLI. File extension `.hql`.
     - Apache Spark Python - [Apache Spark Python](https://spark.apache.org/docs/latest/sql-programming-guide.html) code run using `spark-submit`. File extension `.py`.
-    - Dummy Task - Does nothing! - File Extension `.dmy`.
+    - Dummy Task - Does nothing! - File Extensions `.dmy` and `.txt`.
 * Templating - Tasks can be templated to suport running in different environments.
-* Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding new tasks](#adding-a-task-type))
+* Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding a task type](#adding-a-task-type))
 
 ## Example - Running a Single Task
 To run a single task (for example, some SQL against a JDBC connection), place the SQL file in a directory together with
