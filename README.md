@@ -17,7 +17,7 @@
     - Apache Spark Python - [Apache Spark Python](https://spark.apache.org/docs/latest/sql-programming-guide.html) code run using `spark-submit`. File extension `.py`.
     - Dummy Task - Does nothing! - File Extension `.dmy`.
 * Templating - Tasks can be templated to suport running in different environments.
-* Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding new tasks](#adding-new-tasks))
+* Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding new tasks](#adding-a-task-type))
 
 ## Example - Running a Single Task
 To run a single task (for example, some SQL against a JDBC connection), place the SQL file in a directory together with
@@ -78,7 +78,7 @@ TaskRunner will execute `create_foo.sql` and `create_bar.sql` in parallel.
 
 
 ## Example - Introducing Task Dependencies 
-Let's say we wanted to make `create_bar.sql` dependent on the successful execution of `create_foo.sql`. Simple add the following *task specific* configuration file, 
+Let's say we wanted to make `create_bar.sql` dependent on the successful execution of `create_foo.sql`. Simply add the following *task specific* configuration file, 
 which **must** be named the same as its task but with a `.conf` extension: -
 
 File: `create_bar.conf`
@@ -92,7 +92,7 @@ Now `create_bar.sql` will only run upon the successful execution of `create_foo.
 Note that `depends-on.id` is a list so multiple dependencies can be added for a single task if required.
 
 ## Example - Task Templates
-Let's say we wanted to run the same SQL against different environments, and the database schema changes between them.
+Let's say we wanted to run the same SQL against different environments, and the database schema/table changes between them.
 This can be done by introducing template fields in the task and corresponding task config (`.conf`) file: -
 
 
@@ -129,7 +129,7 @@ create table testschema.mock_bar (
 ```
 
 ## Configuration
-The [typesafe config](https://github.com/lightbend/config) is used as a configuration engine. With application level and individual task configuration.
+The [typesafe config](https://github.com/lightbend/config) library is used as a configuration engine. With application level and individual task configuration.
 
 ### Application Config
 Application wide config should be placed in a file called `application.conf` in the directory pointed to by the `-conf` command line option. The following values are
@@ -236,8 +236,8 @@ Maven is used as the build tool with the following goals: -
 mvn clean compile test package install
 ```
 
-## Extending the framework - Adding a Task Type
-Google guice is used as the DI framework, to add a custom task, do the following: -
+## Adding a Task Type
+Google [guice](https://github.com/google/guice) is used as the DI framework, to add a custom task, do the following: -
 
 1. Create a new class that extends `BaseTask`.
 2. Create custom task execution class that implements the `TaskExecutor` interface.
@@ -254,12 +254,14 @@ Google guice is used as the DI framework, to add a custom task, do the following
 ```
 
 The file extension(s) that the built in tasks processes by default can also be chanaged here.
+
 See package `net.martinprobson.jobrunner.dummytask`  for an example of the three classes required.
 
 ## Caveats
 
 - This code is intended to be a lightwight framework to allow easy unit and integration testing of Apache Hadoop/Spark workflows. You should probably look into
 a full featured execuition engine if you need more scheduling and error recovery options. I recommend [Apache airflow](https://airflow.apache.org/) for this.
+
 
 ## Acknowledgements
 
