@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.martinprobson.jobrunner.sparkpythontask;
+package net.martinprobson.jobrunner.hivetask;
 
 import net.martinprobson.jobrunner.common.AbstractExternalCmdExecutor;
 import net.martinprobson.jobrunner.common.BaseTask;
@@ -23,78 +23,70 @@ import net.martinprobson.jobrunner.common.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
 
 /**
- * <p>{@code SparkPythonTaskExecutor}</p>
+ * <p>{@code HiveTaskExecutor}</p>
  *
- * <p>Responsible for executing Python Spark code via a Spark connection.</p>
- * <p>Code is executed via {@code spark-submit}</p>
+ * <p>Responsible for executing Hive QL script via Hive cli.</p>
  *
  * @author martinr
  */
-class SparkPythonTaskExecutor extends AbstractExternalCmdExecutor implements TaskExecutor {
+class HiveTaskExecutor extends AbstractExternalCmdExecutor implements TaskExecutor {
 
     /**
      * <p>Check the environment is capable of executing the command.</p>
      * <p>For example, do the required environment variables exist? etc</p>
-     *
      * @throws JobRunnerException If there is an issue with the environment.
      */
     @Override
     protected void checkEnv() throws JobRunnerException {
-        if (System.getenv("SPARK_HOME") == null) {
-            throw new JobRunnerException("Environment variable SPARK_HOME is not set.");
+        if (System.getenv("HIVE_HOME") == null) {
+            StringBuilder msg = new StringBuilder("Environment variable HIVE_HOME is not set.");
+            throw new JobRunnerException(msg.toString());
         }
     }
 
     /**
      * <p>Get the timeout interval in milliseconds.</p>
+     * @throws JobRunnerException If there is an issue with the environment.
      */
     @Override
     protected long getTimeOutMs(BaseTask task) {
-        return task.getConfig().getLong("spark-python.timeoutms");
+        return task.getConfig().getLong("hive.timeoutms");
     }
 
     /**
      * <p>Get the command to run.</p>
      */
     protected String getCmd() {
-        return System.getenv("SPARK_HOME") +
+        return System.getenv("HIVE_HOME") +
                 File.separatorChar +
                 "bin" +
                 File.separatorChar +
-                "spark-submit";
+                "hive";
     }
 
     /**
      * <p>Get the command arguments.</p>
-     *
      * @throws JobRunnerException If there is an issue with the environment.
      */
     @Override
     protected String[] getArgs(BaseTask task) throws JobRunnerException {
-        return new String[]{"--master",
-                task.getConfig().getString("spark-python.master"),
-                "--num-executors",
-                task.getConfig().getString("spark-python.num-executors"),
-                "--queue",
-                task.getConfig().getString("spark-python.queue"),
-                super.createTempFile(task).getAbsolutePath()};
+        return new String[]{"-f", super.createTempFile(task).getAbsolutePath()};
     }
 
     /**
      * <p>Get temp file name prefix</p>
      */
     @Override
-    protected String getTempFilePrefix() { return "spark-python";}
+    protected String getTempFilePrefix() { return "hive";}
 
     /**
      * <p>Get temp file name suffix</p>
      */
     @Override
-    protected String getTempFileSuffix() { return ".py";}
+    protected String getTempFileSuffix() { return ".hql";}
 
-    private static final Logger log = LoggerFactory.getLogger(SparkPythonTaskExecutor.class);
-
+    private static final Logger log = LoggerFactory.getLogger(HiveTaskExecutor.class);
 }

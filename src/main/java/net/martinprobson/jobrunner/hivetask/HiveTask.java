@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package net.martinprobson.jobrunner.sparkscalatask;
+package net.martinprobson.jobrunner.hivetask;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -29,34 +29,34 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * <p>{@code SparkScalaTask}</p>
+ * <p>{@code HiveTask}</p>
  *
- * <p>A task that holds Spark Scala script code that will be executed in Spark via {@code Spark-shell}.</p>
+ * <p>A task that holds Hive QL code that will be executed in Hive via the hive cli.</p>
  *
  * @author martinr
  */
-class SparkScalaTask extends BaseTask {
+class HiveTask extends BaseTask {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkScalaTask.class);
+    private static final Logger log = LoggerFactory.getLogger(HiveTask.class);
     @SuppressWarnings("unused")
     private static TaskExecutor taskExecutor = null;
 
     /**
      *
-     * Creates a SparkScalaTask with the specified id,scala code and task configuration.
+     * Creates a HiveTask with the specified id,QL and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Spark Scala script code to run.
+     * @param content            Hive QL script code to run.
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
-    private SparkScalaTask(TemplateService templateService,
-                           @Named("spark-scala") TaskExecutor jdbcTaskExecutor,
-                           @Assisted("taskid")   String taskId,
-                           @Assisted("content")  String content,
-                           @Assisted Config taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
-        log.trace("Built a new SparkScalaTask: " + this);
+    private HiveTask(TemplateService templateService,
+                     @Named("hive") TaskExecutor hiveTaskExecutor,
+                     @Assisted("taskid")   String taskId,
+                     @Assisted("content")  String content,
+                     @Assisted Config taskConfiguration) {
+        super(taskId,content,taskConfiguration,templateService,hiveTaskExecutor);
+        log.trace("Built a new HiveTask: " + this);
     }
 
 }

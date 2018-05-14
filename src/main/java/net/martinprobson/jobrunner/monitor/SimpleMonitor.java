@@ -26,11 +26,11 @@ public class SimpleMonitor {
     }
 
     private void monitor() {
-        System.out.println(job.toString());
+        job.printStatus();
     }
 
     public void start() {
-        monitorService.scheduleAtFixedRate(this::monitor, 0, 1, TimeUnit.SECONDS);
+        monitorService.scheduleAtFixedRate(this::monitor, 0, 10, TimeUnit.SECONDS);
     }
 
     public void stop() {

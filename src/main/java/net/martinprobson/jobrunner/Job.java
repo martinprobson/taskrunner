@@ -16,6 +16,9 @@
  */
 package net.martinprobson.jobrunner;
 
+import com.diogonunes.jcdp.bw.Printer;
+import com.diogonunes.jcdp.color.ColoredPrinter;
+import com.diogonunes.jcdp.color.api.Ansi;
 import com.github.dexecutor.core.task.TaskProvider;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
@@ -90,6 +93,37 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
                     .append("]\n");
         }
         return sb.toString();
+    }
+
+    public void printStatus() {
+        ColoredPrinter cp = new ColoredPrinter.Builder(1,false)
+                .foreground(com.diogonunes.jcdp.color.api.Ansi.FColor.WHITE)
+                .background(com.diogonunes.jcdp.color.api.Ansi.BColor.BLACK)
+                .build();
+        for (BaseTask task : this) {
+            cp.print("id: [");
+            cp.print(task.getId(),Ansi.Attribute.BOLD,Ansi.FColor.WHITE,Ansi.BColor.BLACK);
+            cp.print("]\n\t Task Status: [");
+            TaskResult.Result result = task.getTaskResult().getResult();
+            switch (result) {
+                case SUCCESS:
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.WHITE);
+                    break;
+                case FAILED:
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.WHITE);
+                    break;
+                case RUNNING:
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.YELLOW, Ansi.BColor.WHITE);
+                    break;
+                case NOT_EXECUTED:
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.BLACK);
+                    break;
+                default:
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.BLACK);
+                    break;
+            }
+            cp.println("]\n");
+        }
     }
 
     /**

@@ -102,7 +102,8 @@ public class RunJob {
 
         // Initialize out global configuration.
         initializeGlobalConfig(configDirectory);
-        ExecutorService executorService = Executors.newFixedThreadPool(200);
+        int numThreads = GlobalConfigurationProvider.get().getConfiguration().getInt("jobrunner.threads");
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
         int rc = 0;
         JobRunnerConfig config;
         try {
