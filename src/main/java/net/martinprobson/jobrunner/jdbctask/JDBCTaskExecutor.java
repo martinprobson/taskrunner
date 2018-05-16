@@ -16,6 +16,7 @@
  */
 package net.martinprobson.jobrunner.jdbctask;
 
+import net.martinprobson.jobrunner.auth.Kerberos;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.common.TaskExecutor;

@@ -107,13 +107,13 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
             TaskResult.Result result = task.getTaskResult().getResult();
             switch (result) {
                 case SUCCESS:
-                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.WHITE);
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.GREEN, Ansi.BColor.BLACK);
                     break;
                 case FAILED:
-                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.WHITE);
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.RED, Ansi.BColor.BLACK);
                     break;
                 case RUNNING:
-                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.YELLOW, Ansi.BColor.WHITE);
+                    cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.YELLOW, Ansi.BColor.BLACK);
                     break;
                 case NOT_EXECUTED:
                     cp.print(result, Ansi.Attribute.BOLD, Ansi.FColor.WHITE, Ansi.BColor.BLACK);

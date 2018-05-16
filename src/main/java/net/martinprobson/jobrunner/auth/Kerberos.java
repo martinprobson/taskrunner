@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.martinprobson.jobrunner.jdbctask;
+package net.martinprobson.jobrunner.auth;
 
 import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
@@ -31,7 +31,7 @@ import java.io.OutputStream;
  * Get a valid Kerberos ticket based on jdbc.user/jdbc.password and kerberos.principal specified in configuration.
  * <p></p>
  */
-class Kerberos {
+public class Kerberos {
 
     private static final String KERBEROS_USERNAME;
     private static final String KERBEROS_PASSWORD;

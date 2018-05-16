@@ -17,6 +17,7 @@
 package net.martinprobson.jobrunner.jdbctask;
 
 import com.typesafe.config.Config;
+import net.martinprobson.jobrunner.auth.Kerberos;
 import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.slf4j.Logger;

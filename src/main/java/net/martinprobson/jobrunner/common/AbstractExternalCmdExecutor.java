@@ -1,6 +1,7 @@
 package net.martinprobson.jobrunner.common;
 
 import net.martinprobson.jobrunner.TaskResult;
+import net.martinprobson.jobrunner.auth.Kerberos;
 import org.apache.commons.io.FileUtils;
 import org.buildobjects.process.ExternalProcessFailureException;
 import org.buildobjects.process.ProcBuilder;
@@ -77,23 +78,19 @@ public abstract class AbstractExternalCmdExecutor implements TaskExecutor {
     protected void execute(BaseTask task) throws JobRunnerException {
         log.trace(getClass().getName() + " executeTask - " + task.getId());
         checkEnv();
+        Kerberos.auth();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ByteArrayOutputStream error = new ByteArrayOutputStream();
         ProcBuilder procBuilder = new ProcBuilder(getCmd())
                 .withArgs(getArgs(task))
                 .withOutputStream(output)
-                .withErrorStream(error)
                 .withTimeoutMillis(getTimeOutMs(task));
         try {
             procBuilder.run();
         } catch (ExternalProcessFailureException e) {
-            log.error("TaskId: " + task.getId() + " stderr: " + error,e);
             throw new JobRunnerException("Task: " + task.getId() + " failed", e);
         } catch (TimeoutException e) {
-            log.error("TaskId: " + task.getId() + " stderr: " + error,e);
             throw new JobRunnerException("Task: " + task.getId() + " timeout", e);
         } catch (Exception e) {
-            log.error("TaskId: " + task.getId() + " stderr: " + error,e);
             throw new JobRunnerException("Task: " + task.getId(), e);
         }
     }
