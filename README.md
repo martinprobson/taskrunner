@@ -266,3 +266,5 @@ a full featured execuition engine if you need more scheduling and error recovery
 ## Acknowledgements
 
 Thanks to [Nadeem Mohammad](https://github.com/dexecutor/dexecutor-core) for the Dexecutor code that this framework builds on.
+
+*Martin Robson* 2018
