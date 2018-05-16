@@ -63,7 +63,7 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
     /**
      * <p>Given a filename of the form {@code file.<ext>}
      * attempt to find a corresponding <code>file.conf</code> file
-     * in the same directory.</p>
+     * in the config directory.</p>
      * <p>If found, then load the task specific configuration from
      * the file.</p>
      * <p>If not found, just return an empty configuration.</p>
