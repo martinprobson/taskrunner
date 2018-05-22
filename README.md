@@ -16,7 +16,7 @@
     - Hive HQL -  [Apache Hive HQL](https://cwiki.apache.org/confluence/display/Hive/LanguageManual) run using the Hive CLI. File extension `.hql`.
     - Apache Spark Python - [Apache Spark Python](https://spark.apache.org/docs/latest/sql-programming-guide.html) code run using `spark-submit`. File extension `.py`.
     - Dummy Task - Does nothing! - File Extensions `.dmy` and `.txt`.
-* Templating - Tasks can be templated to suport running in different environments.
+* Templating - Tasks can be templated to support running in different environments.
 * Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding a task type](#adding-a-task-type))
 
 ## Example - Running a Single Task
@@ -262,6 +262,9 @@ See package `net.martinprobson.jobrunner.dummytask`  for an example of the three
 - This code is intended to be a lightwight framework to allow easy unit and integration testing of Apache Hadoop/Spark workflows. You should probably look into
 a full featured execuition engine if you need more scheduling and error recovery options. I recommend [Apache airflow](https://airflow.apache.org/) for this.
 
+## To Do
+
+- Swap out the DExecutor back end with an AKKA Actor library.
 
 ## Acknowledgements
 
