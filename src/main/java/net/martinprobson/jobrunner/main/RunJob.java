@@ -133,7 +133,7 @@ public class RunJob {
     private static void initializeGlobalConfig(String configDirectory) {
         String appConfigFilename;
         if (configDirectory.endsWith(File.separator))
-            appConfigFilename = configDirectory + "applicaction.conf";
+            appConfigFilename = configDirectory + "application.conf";
         else
             appConfigFilename = configDirectory + File.separator + "application.conf";
         if (!Files.exists(Paths.get(appConfigFilename))) {
