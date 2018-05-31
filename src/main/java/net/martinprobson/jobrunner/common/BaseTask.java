@@ -50,7 +50,7 @@ import java.util.Objects;
  * <p></p>
  * <p>Internally this class also maintains references to the following service objects: -</p>
  * <ol><li>A template service provider, that is called to apply template fields against the task contents.</li>
- * <li>An execution service reponsible for actually executing the task (for example execute SQL against a JDBC connection).</li>
+ * <li>An execution service responsible for actually executing the task (for example execute SQL against a JDBC connection).</li>
  * <li>A {@link TaskResult} holding the execution result of the task.</li></ol>
  * <p>Sub-classes are expected to supply a specific execution service for the type of task they are defining.</p>
  *

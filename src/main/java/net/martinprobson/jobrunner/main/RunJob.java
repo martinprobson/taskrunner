@@ -69,7 +69,7 @@ public class RunJob {
      * @author martinr
      */
     static int render(Args args) {
-        // Initialize out global configuration.
+        // Initialize our global configuration.
         initializeGlobalConfig(args.configDirectory);
         int rc = 0;
         try {

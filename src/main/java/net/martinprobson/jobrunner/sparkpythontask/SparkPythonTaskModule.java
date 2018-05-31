@@ -23,7 +23,7 @@ public class SparkPythonTaskModule extends AbstractModule {
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
         mapBinder.addBinding("spark-python").toProvider(FactoryProvider.newFactory(TaskFactory.class, SparkPythonTask.class));
 
-        // JDBCTask needs a Task Executor and TemplateService implementation.
+        // Need a Task Executor and TemplateService implementation.
         bind(TemplateService.class).to(FreeMarkerTemplateService.class);
         bind(TaskExecutor.class).annotatedWith(Names.named("spark-python")).to(SparkPythonTaskExecutor.class);
     }
