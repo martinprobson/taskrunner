@@ -16,39 +16,123 @@
  */
 package net.martinprobson.jobrunner;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 /**
+ * <p>
  * A TaskResult holds the results of a Task execution.
+ * A TaskResult is immutable.
+ * </p><p>
  *
+ * {@code TaskResult} must be constructed via a {@link Builder}
+ * </p>
  * @author martinr
  */
-public class TaskResult {
-    private final Throwable exception;
-    private final Result result;
+final public class TaskResult {
+    /** Any exception thrown during execution of the task */
+    private Throwable exception;
+
+    /** The result {@code TaskResult.Result} of executing the task */
+    private Result result;
+
+    /** Exit value from external command (if relevant). */
+    private int exitValue;
+
+    /** Contents of stderr of task output (if relevant). */
+    private String error;
+
+    /** Contents of stdout of task output (if relevant). */
+    private String output;
+
+    /** The command line executed if external command */
+    private String procString;
 
     /**
-     * Construct an empty TaskResult.
+     * <p>
+     * A TasKResult Builder.
+     * </p>
      */
-    public TaskResult() {
-        this(Result.NOT_EXECUTED,null);
+    public static class Builder {
+
+        public Builder(TaskResult.Result result) {
+            this.result = result;
+        }
+
+        public Builder exception(Throwable exception) {
+            this.exception = exception;
+            return this;
+        }
+        public Builder exitValue(int exitValue) {
+            this.exitValue = exitValue;
+            return this;
+        }
+        public Builder error(String error) {
+            this.error = error;
+            return this;
+        }
+        public Builder output(String output) {
+            this.output = output;
+            return this;
+        }
+        public Builder procString(String procString) {
+            this.procString = procString;
+            return this;
+        }
+        public TaskResult build() {
+            return new TaskResult(this);
+        }
+
+        private final Result result;
+        private Throwable exception;
+        private int exitValue;
+        private String error;
+        private String output;
+        private String procString;
     }
 
-    /**
-     * Construct a TaskResult with a result, message and exception.
-     * @param result    The {@code Result} of the Task.
-     * @param t         Exception returned by the task.
-     */
-    public TaskResult(Result result, Throwable t) {
-        this.result = result;
-        this.exception = t;
+    private TaskResult(Builder builder) {
+        this.exception = builder.exception;
+        this.result = builder.result;
+        this.exitValue = builder.exitValue;
+        this.error = builder.error;
+        this.output = builder.output;
+        this.procString = builder.procString;
     }
 
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("exception", exception)
+                .add("result", result)
+                .add("exitValue", exitValue)
+                .add("error", error)
+                .add("output", output)
+                .add("procString", procString)
+                .toString();
+    }
 
-    /**
-     * Construct a TaskResult with a result and exception.
-     * @param result    The {@code Result} of the Task.
-     */
-    public TaskResult(Result result) {
-        this(result, null);
+    public Throwable getException() {
+        return exception;
+    }
+
+    public int getExitValue() {
+        return exitValue;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public String getProcString() {
+        return procString;
+    }
+
+    public Result getResult() {
+        return result;
     }
 
     /**
@@ -65,24 +149,6 @@ public class TaskResult {
      */
     public Boolean failed() {
         return result == Result.FAILED;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("[ ");
-        sb.append(result).append(" ");
-        if (exception != null)
-            sb.append(exception).append(" ").append(exception.getCause());
-        sb.append("]");
-        return sb.toString();
-    }
-
-    /**
-     *
-     * @return The result held by this TaskResult.
-     */
-    public Result getResult() {
-        return result;
     }
 
     public enum Result {

@@ -16,14 +16,14 @@
  */
 package net.martinprobson.jobrunner.sparkpythontask;
 
-import net.martinprobson.jobrunner.common.AbstractExternalCmdExecutor;
-import net.martinprobson.jobrunner.common.BaseTask;
-import net.martinprobson.jobrunner.common.JobRunnerException;
-import net.martinprobson.jobrunner.common.TaskExecutor;
+import com.google.inject.Inject;
+import net.martinprobson.jobrunner.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>{@code SparkPythonTaskExecutor}</p>
@@ -42,10 +42,8 @@ class SparkPythonTaskExecutor extends AbstractExternalCmdExecutor implements Tas
      * @throws JobRunnerException If there is an issue with the environment.
      */
     @Override
-    protected void checkEnv() throws JobRunnerException {
-        if (System.getenv("SPARK_HOME") == null) {
-            throw new JobRunnerException("Environment variable SPARK_HOME is not set.");
-        }
+    public void checkEnv(BaseTask task) throws JobRunnerException {
+        checkEnv(task.getConfig().getStringList("spark-python.environment"));
     }
 
     /**
@@ -69,18 +67,22 @@ class SparkPythonTaskExecutor extends AbstractExternalCmdExecutor implements Tas
 
     /**
      * <p>Get the command arguments.</p>
-     *
-     * @throws JobRunnerException If there is an issue with the environment.
      */
     @Override
     protected String[] getArgs(BaseTask task) throws JobRunnerException {
-        return new String[]{"--master",
-                task.getConfig().getString("spark-python.master"),
-                "--num-executors",
-                task.getConfig().getString("spark-python.num-executors"),
-                "--queue",
-                task.getConfig().getString("spark-python.queue"),
-                super.createTempFile(task).getAbsolutePath()};
+        List<String> args = new ArrayList<>();
+        args.add("--master");
+        args.add(task.getConfig().getString("spark-python.master"));
+        args.add("--num-executors");
+        args.add(task.getConfig().getString("spark-python.num-executors"));
+        args.add("--queue");
+        args.add(task.getConfig().getString("spark-python.queue"));
+        if (!task.getConfig().getIsNull("spark-python.driver-java-options")) {
+            args.add("--driver-java-options");
+            args.add(task.getConfig().getString("spark-python.driver-java-options"));
+        }
+        args.add(super.createTempFile(task).getAbsolutePath());
+        return args.toArray(new String[0]);
     }
 
     /**

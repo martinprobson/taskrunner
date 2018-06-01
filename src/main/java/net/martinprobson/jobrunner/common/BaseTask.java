@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package net.martinprobson.jobrunner.common;
 
@@ -91,17 +75,6 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      * Construct a new Task with the given id and contents.
      * @param id    task id.
      * @param task  task contents.
-     * @param templateService The template service provider.
-     * @param taskExecutor The task executor service responsible for executing tasks of this type.
-     */
-    private BaseTask(String id, String task, TemplateService templateService, TaskExecutor taskExecutor) {
-        this(id,task, ConfigFactory.empty(),templateService,taskExecutor);
-    }
-
-    /**
-     * Construct a new Task with the given id and contents.
-     * @param id    task id.
-     * @param task  task contents.
      * @param taskConfig The task specific config.
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
@@ -113,7 +86,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         this.config = taskConfig.withFallback(GlobalConfigurationProvider.get().getConfiguration());
         this.templateService = templateService;
         this.taskExecutor = taskExecutor;
-        this.result = new TaskResult();
+        this.result = new TaskResult.Builder(TaskResult.Result.NOT_EXECUTED).build();
         log.trace("Built a new " + this.getClass() + " - " + this.getId());
     }
 
@@ -181,9 +154,11 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * Set the {@code TaskResult} for this task.
      * @param t - TaskResult
+     * @return The TaskResult just set.
      */
-    public void setTaskResult(TaskResult t) {
+    public TaskResult setTaskResult(TaskResult t) {
         result = t;
+        return t;
     }
 
     /**
@@ -222,18 +197,19 @@ public abstract class BaseTask extends Task<String, TaskResult> {
      */
     public TaskResult execute() throws TaskExecutionException {
         log.trace("About to execute task id: " + this.getId());
-        setTaskResult(new TaskResult(TaskResult.Result.RUNNING));
+        setTaskResult(new TaskResult.Builder(TaskResult.Result.RUNNING).build());
+        TaskResult taskResult;
         try {
-            taskExecutor.executeTask(this);
+            taskResult = taskExecutor.executeTask(this);
         } catch (Exception e) {
-            setTaskResult(new TaskResult(TaskResult.Result.FAILED,e));
+            setTaskResult(new TaskResult.Builder(TaskResult.Result.FAILED).exception(e).build());
             throw new TaskExecutionException("Task: " + getId() + " failed with " + e.getMessage(),e);
         }
-        if (getTaskResult().failed())
-            log.error("Task: " + this.getId() + " Result: " + getTaskResult());
+        if (taskResult.failed())
+            log.error("Task: " + this.getId() + " Result: " + taskResult);
         else
-            log.trace("Task: " + this.getId() + " Result: " + getTaskResult());
-        return getTaskResult();
+            log.trace("Task: " + this.getId() + " Result: " + taskResult);
+        return setTaskResult(taskResult);
     }
 
     /**

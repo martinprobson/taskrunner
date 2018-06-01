@@ -135,6 +135,7 @@ public class TaskProvider {
             } catch (Exception e) {
                 throw new java.util.ServiceConfigurationError("Error occured during task configuration.",e);
             }
+            /* This is where the actual list of Modules is provided to Guice to perform the DI */
             Injector injector = Guice.createInjector(pluginConfig.pluginModules);
             singleton = injector.getInstance(TaskProvider.class);
         }

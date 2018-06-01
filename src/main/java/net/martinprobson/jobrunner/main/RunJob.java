@@ -21,15 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class RunJob {
 
     /**
-     * Logger
-     */
-    private static final Logger log = LoggerFactory.getLogger(RunJob.class);
-    private static Job job;
-
-    private RunJob() {
-    }
-
-    /**
      * <h3>{@code RunJob.main}</h3>
      * <p>Main command line entry point for the RunJob application.</p>
      * <p>Run a group of related tasks according to specifications passed in via the
@@ -68,7 +59,7 @@ public class RunJob {
      * 1 Error exception occurred.
      * @author martinr
      */
-    static int render(Args args) {
+    private static int render(Args args) {
         // Initialize our global configuration.
         initializeGlobalConfig(args.configDirectory);
         int rc = 0;
@@ -212,5 +203,14 @@ public class RunJob {
             this.renderTask = renderTask;
             this.renderTaskId = renderTaskId;
         }
+    }
+
+    /**
+     * Logger
+     */
+    private static final Logger log = LoggerFactory.getLogger(RunJob.class);
+    private static Job job;
+
+    private RunJob() {
     }
 }

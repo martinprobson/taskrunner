@@ -50,12 +50,12 @@ class SparkPythonTask extends BaseTask {
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
-    private SparkPythonTask(TemplateService templateService,
-                            @Named("spark-python") TaskExecutor jdbcTaskExecutor,
+    private SparkPythonTask(@Named("spark-python") TemplateService templateService,
+                            @Named("spark-python") TaskExecutor executor,
                             @Assisted("taskid")   String taskId,
                             @Assisted("content")  String content,
                             @Assisted Config taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,jdbcTaskExecutor);
+        super(taskId,content,taskConfiguration,templateService,executor);
     }
 
 }

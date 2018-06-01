@@ -42,7 +42,7 @@ public class SimpleMonitor {
     public static void main(String args[]) {
         String testDir = new File(Objects.requireNonNull(RunJob.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
         try {
-            Job job = new Job(LocalFileSystemTaskBuilder.create(testDir,testDir));
+            Job job = new Job(LocalFileSystemTaskBuilder.create(testDir, testDir));
             SimpleMonitor monitor = SimpleMonitor.getInstance(job);
             monitor.start();
             TimeUnit.SECONDS.sleep(30);

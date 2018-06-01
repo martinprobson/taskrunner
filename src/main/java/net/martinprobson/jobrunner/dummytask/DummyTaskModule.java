@@ -14,7 +14,9 @@ import net.martinprobson.jobrunner.template.TemplateService;
  * <h3>{@code DummyTaskModule}</h3>
  * <p>Google Guice dependency injection for {@code DummyTask}.</p>
  * <p>This Task is injected into list of available task types (via the
- * {@code MapBinder}.</p>
+ * {@code MapBinder}
+ * - See <a href="https://github.com/google/guice/wiki/Multibindings">Guice Multi-bindings</a>)
+ * </p>
  *
  */
 public class DummyTaskModule extends AbstractModule {

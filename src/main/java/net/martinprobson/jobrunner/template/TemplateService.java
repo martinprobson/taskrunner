@@ -14,7 +14,7 @@ import com.typesafe.config.Config;
  */
 public interface TemplateService {
     /**
-     * Apply the template fields defined in {@code COnfiguation} to the given content.
+     * Apply the template fields defined in {@code Configuration} to the given content.
      * Returns the content modified by the template fields or a {@code TemplateException} on error
      * (for example missing fields).
      * @param id The id of the content (used for error reporting).

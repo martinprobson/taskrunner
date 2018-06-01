@@ -25,10 +25,15 @@ import java.util.*;
  * Attributes are: -
  * <ul>
  *     <li>{@code name} - Task name</li>
- *     <li>{@code plugin-module} - Name of the Java class that implements this Task.</li>
+ *     <li>{@code plugin-module} - Name of the Google Guice module that is responsible for injecting
+ *     the required implementation classes into the framework. See note below.</li>
  *     <li>{@code file-extensions} - The list of file extensions supported by this task.</li>
  * </ul>
  * <p>The list of configured tasks is returned in a {@link PluginTaskConfiguration} object.</p>
+ * <p></p>
+ * <h3>Note on plugin-module</h3>
+ * <p>Each plugin-module entry should reference a Google Guice Module class responsible for wiring
+ * up the required class dependencies. see {@link net.martinprobson.jobrunner.dummytask.DummyTaskModule} for an example.</p>
  */
 public class PluginTaskConfigurationProvider implements ConfigurationProvider<PluginTaskConfiguration> {
     @Override

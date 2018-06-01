@@ -15,6 +15,7 @@
     - JDBC - SQL code that can be run against a standard JDBC connection. File extension `.sql`.
     - Hive HQL -  [Apache Hive HQL](https://cwiki.apache.org/confluence/display/Hive/LanguageManual) run using the Hive CLI. File extension `.hql`.
     - Apache Spark Python - [Apache Spark Python](https://spark.apache.org/docs/latest/sql-programming-guide.html) code run using `spark-submit`. File extension `.py`.
+    - Apache Spark Jar - Execute a Jar using `spark-submit`. File extension `.jar`.
     - Dummy Task - Does nothing! - File Extensions `.dmy` and `.txt`.
 * Templating - Tasks can be templated to support running in different environments.
 * Plugin architecture - New tasks types can be added to the framework using dependency injection (See [Adding a task type](#adding-a-task-type))
@@ -159,16 +160,33 @@ kerberos {
 # spark-python task: Default arguments for the spark submit command.
 #
 spark-python {
+  # environment is a list of environment variables to check.
+  environment = ["SPARK_HOME"]
   master = "local[*]"
   queue = "default"
   num-executors = 2
   timeoutms = 600000
+  driver-java-options = null
 }
 
+#
+# spark-jar task: Default arguments for the spark submit command.
+#
+spark-jar {
+  # environment is a list of environment variables to check.
+  environment = ${spark-python.environment}
+  master = ${spark-python.master}
+  queue = ${spark-python.queue}
+  num-executors = ${spark-python.num-executors}
+  timeoutms = ${spark-python.timeoutms}
+  driver-java-options = null
+}
 #
 # Default timeout (in milli-seconds) for hive task executor
 #
 hive {
+  # environment is a list of environment variables to check.
+  environment = ["HIVE_HOME"]
   timeoutms = 600000
 }
 
@@ -203,7 +221,11 @@ jobrunner {
         plugin-module = "net.martinprobson.jobrunner.sparkpythontask.SparkPythonTaskModule"
         file-extensions = [".py"]
       }
-
+      {
+        name = "spark-jar"
+        plugin-module = "net.martinprobson.jobrunner.sparkjartask.SparkJarTaskModule"
+        file-extensions = [".jar"]
+      }
     ]
   }
 
@@ -264,7 +286,7 @@ a full featured execuition engine if you need more scheduling and error recovery
 
 ## To Do
 
-- Swap out the DExecutor back end with an AKKA Actor library.
+- Add additional test coverage.
 
 ## Acknowledgements
 
