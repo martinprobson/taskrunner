@@ -17,12 +17,13 @@ public final class GlobalConfigurationProvider implements ConfigurationProvider<
 
     public static void setConfig(File globalConfigFile) {
         singleton = new GlobalConfigurationProvider(ConfigFactory.parseFile(globalConfigFile)
-                .withFallback(ConfigFactory.load()));
+                .withFallback(ConfigFactory.load())
+                .resolve());
     }
 
     public static ConfigurationProvider<Config> get() {
         if (singleton == null)
-            singleton = new GlobalConfigurationProvider(ConfigFactory.load());
+            singleton = new GlobalConfigurationProvider(ConfigFactory.load().resolve());
         return singleton;
     }
 

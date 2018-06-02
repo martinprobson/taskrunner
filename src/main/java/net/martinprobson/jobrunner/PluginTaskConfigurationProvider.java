@@ -41,7 +41,7 @@ public class PluginTaskConfigurationProvider implements ConfigurationProvider<Pl
         Map<String,String> fileExtensionMapping = new HashMap<>();
         List<Module> modules = new ArrayList<>();
 
-        Config conf = ConfigFactory.load();
+        Config conf = ConfigFactory.load().resolve();
         for (Config c: conf.getConfigList("jobrunner.plugintasks.task")) {
             String name = c.getString("name");
             for (String extn: c.getStringList("file-extensions"))
