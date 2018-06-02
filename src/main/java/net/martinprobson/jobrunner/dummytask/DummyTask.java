@@ -8,8 +8,6 @@ import com.typesafe.config.Config;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@code DummyTask} A task with no content that always returns SUCCESS when executed.

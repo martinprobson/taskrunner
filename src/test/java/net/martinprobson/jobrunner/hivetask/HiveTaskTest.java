@@ -1,4 +1,4 @@
-package net.martinprobson.jobrunner.sparkjartask;
+package net.martinprobson.jobrunner.hivetask;
 
 import com.github.dexecutor.core.task.TaskExecutionException;
 import net.martinprobson.jobrunner.ExceptionTaskExecutor;
@@ -14,11 +14,9 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-public class SparkJarTaskTest {
+public class HiveTaskTest {
 
     private static TaskProvider taskProvider;
 
@@ -29,24 +27,22 @@ public class SparkJarTaskTest {
 
     @Test
     public void getTaskContents() throws JobRunnerException {
-        String jar = "DUMMY";
-        BaseTask task = taskProvider.createTask("spark-jar","test",jar);
-        assertEquals(task.getTaskContents(),jar);
+        BaseTask task = taskProvider.createTask("hive","test","DUMMY");
+        assertEquals(task.getTaskContents(),"DUMMY");
     }
 
     @Test
     public void getTaskId() throws JobRunnerException {
-        BaseTask task = taskProvider.createTask("spark-jar","test","");
+        BaseTask task = taskProvider.createTask("hive","test","");
         assertEquals(task.getId(),"test");
     }
 
     @Test
     public void TestExecuteSuccess() throws JobRunnerException {
-        String jar = "DUMMY.jar";
-        BaseTask task = new SparkJarTask(new DummyTemplateService(),
+        BaseTask task = new HiveTask(new DummyTemplateService(),
                 new DummyTaskExecutor(),
                 "test",
-                jar,
+                "DUMMY",
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.succeeded());
@@ -54,11 +50,10 @@ public class SparkJarTaskTest {
 
     @Test
     public void TestExecuteFailure() throws JobRunnerException {
-        String jar = "DUMMY.jar";
-        BaseTask task = new SparkJarTask(new DummyTemplateService(),
+        BaseTask task = new HiveTask(new DummyTemplateService(),
                 new FailureTaskExecutor(),
                 "test",
-                jar,
+                "DUMMY",
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.failed());
@@ -66,11 +61,10 @@ public class SparkJarTaskTest {
 
     @Test
     public void TestExecuteException() throws JobRunnerException {
-        String jar = "DUMMY.jar";
-        BaseTask task = new SparkJarTask(new DummyTemplateService(),
+        BaseTask task = new HiveTask(new DummyTemplateService(),
                 new ExceptionTaskExecutor(),
                 "test",
-                jar,
+                "DUMMY",
                 GlobalConfigurationProvider.get().getConfiguration());
         try {
             TaskResult result = task.execute();
@@ -83,7 +77,7 @@ public class SparkJarTaskTest {
 
     @Test
     public void equalsContract() {
-        EqualsVerifier.forClass(SparkJarTask.class)
+        EqualsVerifier.forClass(HiveTask.class)
                 .usingGetClass()
                 .withIgnoredFields("taskExecutor","config","id","considerExecutionError","result","templateService")
                 .verify();

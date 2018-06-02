@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 class SparkPythonTask extends BaseTask {
 
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(SparkPythonTask.class);
     @SuppressWarnings("unused")
     private static TaskExecutor taskExecutor = null;
@@ -50,11 +51,11 @@ class SparkPythonTask extends BaseTask {
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
-    private SparkPythonTask(@Named("spark-python") TemplateService templateService,
-                            @Named("spark-python") TaskExecutor executor,
-                            @Assisted("taskid")   String taskId,
-                            @Assisted("content")  String content,
-                            @Assisted Config taskConfiguration) {
+    SparkPythonTask(@Named("spark-python") TemplateService templateService,
+                    @Named("spark-python") TaskExecutor executor,
+                    @Assisted("taskid") String taskId,
+                    @Assisted("content") String content,
+                    @Assisted Config taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,executor);
     }
 

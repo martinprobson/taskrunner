@@ -1,8 +1,6 @@
 package net.martinprobson.jobrunner.dummytask;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryProvider;
-
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import net.martinprobson.jobrunner.*;
@@ -19,12 +17,14 @@ import net.martinprobson.jobrunner.template.TemplateService;
  * </p>
  *
  */
+@SuppressWarnings( "deprecation" )
 public class DummyTaskModule extends AbstractModule {
 
     @Override
     public void configure() {
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
-        mapBinder.addBinding("dummy").toProvider(FactoryProvider.newFactory(TaskFactory.class, DummyTask.class));
+        //TODO FactoryProvider is deprecated
+        mapBinder.addBinding("dummy").toProvider(com.google.inject.assistedinject.FactoryProvider.newFactory(TaskFactory.class, DummyTask.class));
 
         // DummyTask needs a Task Executor and TemplateService implementation.
         bind(TemplateService.class).to(FreeMarkerTemplateService.class);

@@ -25,6 +25,5 @@ import net.martinprobson.jobrunner.common.BaseTask;
  */
 public interface TaskFactory {
     BaseTask create(String id, String task, Config taskConfiguration);
-//    BaseTask create(@Assisted("id") String id, @Assisted("task") String task);
 
 }

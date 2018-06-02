@@ -29,9 +29,8 @@ public class DefaultExternalCommandBuilder implements ExternalCommandBuilder {
     }
 
     @Override
-    public ExternalCommandBuilder withTimeoutMillis(long timeoutMillis) {
+    public void withTimeoutMillis(long timeoutMillis) {
         procBuilder.withTimeoutMillis(timeoutMillis);
-        return this;
     }
 
     @Override

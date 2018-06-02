@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author martinr
  */
-public interface TaskBuilder {
+interface TaskBuilder {
 
     Map<String, BaseTask> build() throws JobRunnerException;
 

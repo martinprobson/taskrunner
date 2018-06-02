@@ -34,8 +34,7 @@ public class DummyExternalCommandBuilder implements ExternalCommandBuilder {
     }
 
     @Override
-    public ExternalCommandBuilder withTimeoutMillis(long timeoutMillis) {
-        return this;
+    public void withTimeoutMillis(long timeoutMillis) {
     }
 
     @Override

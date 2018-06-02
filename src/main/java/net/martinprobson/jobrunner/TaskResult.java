@@ -30,7 +30,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  */
 final public class TaskResult {
     /** Any exception thrown during execution of the task */
-    private Throwable exception;
+    private final Throwable exception;
 
     /** The result {@code TaskResult.Result} of executing the task */
     private Result result;

@@ -16,7 +16,6 @@
  */
 package net.martinprobson.jobrunner;
 
-import com.diogonunes.jcdp.bw.Printer;
 import com.diogonunes.jcdp.color.ColoredPrinter;
 import com.diogonunes.jcdp.color.api.Ansi;
 import com.github.dexecutor.core.task.TaskProvider;
@@ -73,12 +72,12 @@ public class Job implements Iterable<BaseTask>, TaskProvider<String, TaskResult>
      */
     @Override
     public BaseTask provideTask(String key) {
-//    public BaseTask<String, TaskResult> provideTask(String key) {
         return tasks.get(key);
     }
 
     @Override
-    public Iterator<BaseTask> iterator() {
+    public
+    Iterator<BaseTask> iterator() {
         return tasks.values().iterator();
     }
 

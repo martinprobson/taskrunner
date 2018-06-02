@@ -33,11 +33,11 @@ class HiveTask extends BaseTask {
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
-    private HiveTask(TemplateService templateService,
-                     @Named("hive") TaskExecutor hiveTaskExecutor,
-                     @Assisted("taskid")   String taskId,
-                     @Assisted("content")  String content,
-                     @Assisted Config taskConfiguration) {
+    HiveTask(TemplateService templateService,
+             @Named("hive") TaskExecutor hiveTaskExecutor,
+             @Assisted("taskid") String taskId,
+             @Assisted("content") String content,
+             @Assisted Config taskConfiguration) {
         super(taskId,content,taskConfiguration,templateService,hiveTaskExecutor);
         log.trace("Built a new HiveTask: " + this);
     }

@@ -18,7 +18,7 @@ import net.martinprobson.jobrunner.TaskResult;
 public interface ExternalCommandBuilder {
     ExternalCommandBuilder setCmd(String cmd);
     ExternalCommandBuilder withArgs(String ...args);
-    ExternalCommandBuilder withTimeoutMillis(long timeoutMillis);
+    void withTimeoutMillis(long timeoutMillis);
     TaskResult run();
 
 }
