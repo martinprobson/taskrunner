@@ -23,6 +23,7 @@ import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.ConfigurationProvider;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ import java.util.Optional;
  * modules.
  * <p>A {@code TaskProvider} internally holds a mapping between Task type (String)
  * and Task that it uses to validate and build new Tasks when requested via the
- * {@link TaskProvider#createTask(String, String, String, Config)}</p> methods.
+ * {@link TaskProvider#createTask(String, String, File, Config)}</p> methods.
  *  <p>The actual construction of the Task is handed off to a OldTaskFactory managed
  *  by Guice.</p>
  */
@@ -57,20 +58,20 @@ public class TaskProvider {
      *
      * @param fileExtension The file extension to process (in the form e.g {@code sql}
      * @param taskId The task id.
-     * @param taskContent Task content
+     * @param  taskFile The file containing the task content.
      * @param taskConfiguration (Optional) task specific configuration.
      * @return An {@code Optional<BaseTask>}
      * @throws JobRunnerException General error occurred.
      */
     public Optional<BaseTask> fileExtensionCreateTask(String fileExtension,
                                                       String taskId,
-                                                      String taskContent,
+                                                      File  taskFile,
                                                       Config taskConfiguration ) throws JobRunnerException {
         String taskType = pluginConfig.fileExtensionMapping.get(fileExtension.toLowerCase());
         if (taskType == null)
             return Optional.empty();
         else
-            return Optional.of(createTask(taskType, taskId, taskContent, taskConfiguration));
+            return Optional.of(createTask(taskType, taskId,taskFile, taskConfiguration));
     }
 
     public String[] getSupportedFileExtensions() {
@@ -82,12 +83,12 @@ public class TaskProvider {
      * <p>Construct a new Task with the type {@code taskType}</p>
      * @param taskType The type of task to construct
      * @param taskId The task id of the new task
-     * @param taskContent The content of the new task
+     * @param taskFile The file containing the task content.
      * @param taskConfiguration The task specific configuration (e.g. dependency and/or template fields)
      * @return A new Task of the type {@code taskType}
      * @throws JobRunnerException If the task type is unknown.
      */
-    public BaseTask createTask(String taskType, String taskId, String taskContent, Config taskConfiguration ) throws JobRunnerException {
+    public BaseTask createTask(String taskType, String taskId, File taskFile, Config taskConfiguration ) throws JobRunnerException {
         TaskFactory taskFactory = taskMapping.get(taskType);
         if (taskFactory == null) {
             String sb = "Unknown task type - [" +
@@ -97,7 +98,7 @@ public class TaskProvider {
                     taskMapping.keySet();
             throw new JobRunnerException(sb);
         }
-        return taskFactory.create(taskId,taskContent,taskConfiguration);
+        return taskFactory.create(taskId,taskFile,taskConfiguration);
     }
 
     /**
@@ -105,12 +106,12 @@ public class TaskProvider {
      * <p>Construct a new Task with the type {@code taskType}</p>
      * @param taskType The type of task to construct
      * @param taskId The task id of the new task
-     * @param taskContent The content of the new task
+     * @param taskFile The file containing the task content.
      * @return A new Task of the type {@code taskType}
      * @throws JobRunnerException If the task type is unknown.
      */
-    public BaseTask createTask(String taskType, String taskId, String taskContent) throws JobRunnerException {
-        return createTask(taskType,taskId,taskContent,ConfigFactory.empty());
+    public BaseTask createTask(String taskType, String taskId, File taskFile) throws JobRunnerException {
+        return createTask(taskType,taskId,taskFile,ConfigFactory.empty());
     }
 
     /**
@@ -124,7 +125,7 @@ public class TaskProvider {
      * modules.
      * <p>A {@code TaskProvider} internally holds a mapping between Task type (String)
      * and Task that it uses to validate and build new Tasks when requested via the
-     * {@link TaskProvider#createTask(String, String, String, Config)}</p> methods.
+     * {@link TaskProvider#createTask(String, String, File, Config)}</p> methods.
      *
      * @return A TaskProvider instance that can be used to construct tasks.
      */

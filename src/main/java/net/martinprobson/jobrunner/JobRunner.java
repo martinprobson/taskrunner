@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 
 public class JobRunner extends DefaultDexecutor<String, TaskResult> {
 
-    private static final Logger log = LoggerFactory.getLogger(JobRunner.class);
-    private final JobRunnerConfig config;
-
     public JobRunner(final JobRunnerConfig config) throws JobRunnerException {
         super(config);
         this.config = config;
@@ -61,4 +58,6 @@ public class JobRunner extends DefaultDexecutor<String, TaskResult> {
         }
     }
 
+    private static final Logger log = LoggerFactory.getLogger(JobRunner.class);
+    private final JobRunnerConfig config;
 }

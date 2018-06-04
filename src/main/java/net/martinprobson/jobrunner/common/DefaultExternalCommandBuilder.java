@@ -34,7 +34,7 @@ public class DefaultExternalCommandBuilder implements ExternalCommandBuilder {
     }
 
     @Override
-    public TaskResult run() {
+    public TaskResult run() throws JobRunnerException {
         TaskResult taskResult;
         try {
             ProcResult procResult = procBuilder.run();
@@ -46,9 +46,7 @@ public class DefaultExternalCommandBuilder implements ExternalCommandBuilder {
                     .build();
 
         } catch (Exception e) {
-            taskResult = new TaskResult.Builder(TaskResult.Result.FAILED)
-                    .exception(e)
-                    .build();
+            throw new JobRunnerException("failure",e);
         }
         return taskResult;
     }

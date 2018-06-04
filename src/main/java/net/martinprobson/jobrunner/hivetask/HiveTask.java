@@ -10,6 +10,8 @@ import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 
 /**
  * <p>{@code HiveTask}</p>
@@ -29,16 +31,16 @@ class HiveTask extends BaseTask {
      * Creates a HiveTask with the specified id,QL and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Hive QL script code to run.
+     * @param taskFile           File containing the Hive QL code to run.
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
     HiveTask(TemplateService templateService,
              @Named("hive") TaskExecutor hiveTaskExecutor,
-             @Assisted("taskid") String taskId,
-             @Assisted("content") String content,
+             @Assisted String taskId,
+             @Assisted File taskFile,
              @Assisted Config taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,hiveTaskExecutor);
+        super(taskId,taskFile,taskConfiguration,templateService,hiveTaskExecutor);
         log.trace("Built a new HiveTask: " + this);
     }
 

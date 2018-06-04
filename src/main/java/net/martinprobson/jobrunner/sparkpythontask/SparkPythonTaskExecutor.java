@@ -96,6 +96,7 @@ class SparkPythonTaskExecutor extends AbstractExternalCmdExecutor implements Tas
     @Override
     protected String getTempFileSuffix() { return ".py";}
 
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(SparkPythonTaskExecutor.class);
 
 }

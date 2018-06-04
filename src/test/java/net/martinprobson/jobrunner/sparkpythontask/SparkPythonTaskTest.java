@@ -14,27 +14,33 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.*;
 
 public class SparkPythonTaskTest {
 
     private static TaskProvider taskProvider;
+    private static File taskFile;
 
     @BeforeClass
     public static void setUpBeforeClass() {
         taskProvider = TaskProvider.getInstance();
+        taskFile = new File(SparkPythonTaskTest.class
+                .getClassLoader()
+                .getResource("testfile.txt")
+                .getFile());
     }
 
     @Test
     public void getTaskContents() throws JobRunnerException {
-        String jar = "DUMMY";
-        BaseTask task = taskProvider.createTask("spark-python","test",jar);
-        assertEquals(task.getTaskContents(),jar);
+        BaseTask task = taskProvider.createTask("spark-python","test",taskFile);
+        assertEquals(task.getTaskContents(),"This is a test.");
     }
 
     @Test
     public void getTaskId() throws JobRunnerException {
-        BaseTask task = taskProvider.createTask("spark-python","test","");
+        BaseTask task = taskProvider.createTask("spark-python","test",taskFile);
         assertEquals(task.getId(),"test");
     }
 
@@ -43,7 +49,7 @@ public class SparkPythonTaskTest {
         BaseTask task = new SparkPythonTask(new DummyTemplateService(),
                 new DummyTaskExecutor(),
                 "test",
-                "DUMMY",
+                 taskFile,
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.succeeded());
@@ -54,7 +60,7 @@ public class SparkPythonTaskTest {
         BaseTask task = new SparkPythonTask(new DummyTemplateService(),
                 new FailureTaskExecutor(),
                 "test",
-                "DUMMY",
+                taskFile,
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.failed());
@@ -65,7 +71,7 @@ public class SparkPythonTaskTest {
         BaseTask task = new SparkPythonTask(new DummyTemplateService(),
                 new ExceptionTaskExecutor(),
                 "test",
-                "DUMMY",
+                taskFile,
                 GlobalConfigurationProvider.get().getConfiguration());
         try {
             TaskResult result = task.execute();

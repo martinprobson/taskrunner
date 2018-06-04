@@ -8,6 +8,8 @@ import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
 
+import java.io.File;
+
 
 /**
  * <p>{@code SparkJarTask}</p>
@@ -25,17 +27,17 @@ class SparkJarTask extends BaseTask {
     /**
      *
      * Creates a SparkJarTask with the specified id, jar file name  and task configuration.
-     *  @param taskId             Task Id
-     * @param content            Name of the jar file that will be submitted via spark-submit.
+     * @param taskId             Task Id
+     * @param taskFile            Name of the jar file that will be submitted via spark-submit.
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
     SparkJarTask(@Named("spark-jar")   TemplateService templateService,
                          @Named("spark-jar")   TaskExecutor SparkJarTaskExecutor,
-                         @Assisted("taskid")   String taskId,
-                         @Assisted("content")  String content,
+                         @Assisted             String taskId,
+                         @Assisted             File taskFile,
                          @Assisted Config      taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,SparkJarTaskExecutor);
+        super(taskId,taskFile,taskConfiguration,templateService,SparkJarTaskExecutor);
     }
 
 }

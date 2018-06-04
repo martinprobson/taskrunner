@@ -21,13 +21,10 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigParseOptions;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,16 +91,17 @@ public class LocalFileSystemTaskBuilder implements TaskBuilder {
             for (String taskFile : taskFiles) {
                 File file = new File(testDirectory.getAbsolutePath() + File.separatorChar + taskFile);
                 String fileExtension = FilenameUtils.getExtension(file.getName());
-                String contents;
-                try {
-                    contents = FileUtils.readFileToString(file, Charset.defaultCharset());
-                } catch (IOException e) {
-                    throw new JobRunnerException("Error reading file: " + file, e);
-                }
+                //TODO Tidy
+//                String contents;
+//                try {
+//                    contents = FileUtils.readFileToString(file, Charset.defaultCharset());
+//                } catch (IOException e) {
+//                    throw new JobRunnerException("Error reading file: " + file, e);
+//                }
                 Config taskConfig = getTaskConfiguration(new File(configDirectory), taskFile);
                 BaseTask task = taskProvider.fileExtensionCreateTask("." + fileExtension,
                         taskFile,
-                        contents,
+                        file,
                         taskConfig)
                         .orElseThrow(() -> new JobRunnerException("No mapping found for " + fileExtension.toLowerCase()));
                 taskMap.put(taskFile, task);

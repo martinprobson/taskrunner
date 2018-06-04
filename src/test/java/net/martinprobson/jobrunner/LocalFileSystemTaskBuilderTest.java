@@ -61,9 +61,8 @@ public class LocalFileSystemTaskBuilderTest {
         String[] sqlFiles = testDirectory.list(new SuffixFileFilter(".sql"));
         for (String sqlFile: sqlFiles) {
             File file = new File(testDirectory.getAbsolutePath() + File.separatorChar + sqlFile);
-            String contents = FileUtils.readFileToString(file,Charset.defaultCharset());
             Config config = getTaskConfiguration(testDirectory,sqlFile);
-            expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,contents,config));
+            expectedResults.put(sqlFile, taskProvider.createTask("jdbc",sqlFile,file,config));
         };
     }
 

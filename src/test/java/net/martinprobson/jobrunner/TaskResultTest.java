@@ -1,6 +1,5 @@
 package net.martinprobson.jobrunner;
 
-import com.github.dexecutor.core.task.Task;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

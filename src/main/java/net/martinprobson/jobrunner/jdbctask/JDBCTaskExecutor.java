@@ -24,7 +24,24 @@ import java.util.regex.Pattern;
  * @author martinr
  */
 class JDBCTaskExecutor implements TaskExecutor {
-    private static final Logger log = LoggerFactory.getLogger(JDBCTaskExecutor.class);
+
+    /**
+     * Executes the SQL in a {@code JDBCTask}. The results of the execution are set on the {@code TaskResult} object within the
+     * JDBCTask itself.
+     *
+     * @param task The task to execute.
+     * @throws JobRunnerException on execution error.
+     */
+    @Override
+    public TaskResult executeTask(BaseTask task) throws JobRunnerException {
+        try {
+            ExecuteSqlStmts(task.getRenderedTaskContents());
+        } catch (JobRunnerException e) {
+            task.setTaskResult(new TaskResult.Builder(TaskResult.Result.FAILED).exception(e).build());
+            throw e;
+        }
+        return task.setTaskResult(new TaskResult.Builder(TaskResult.Result.SUCCESS).build());
+    }
 
     /**
      * <p>
@@ -93,21 +110,5 @@ class JDBCTaskExecutor implements TaskExecutor {
         return result.toString();
     }
 
-    /**
-     * Executes the SQL in a {@code JDBCTask}. The results of the execution are set on the {@code TaskResult} object within the
-     * JDBCTask itself.
-     *
-     * @param task The task to execute.
-     * @throws JobRunnerException on execution error.
-     */
-    @Override
-    public TaskResult executeTask(BaseTask task) throws JobRunnerException {
-        try {
-            ExecuteSqlStmts(task.getRenderedTaskContents());
-        } catch (JobRunnerException e) {
-            task.setTaskResult(new TaskResult.Builder(TaskResult.Result.FAILED).exception(e).build());
-            throw e;
-        }
-        return task.setTaskResult(new TaskResult.Builder(TaskResult.Result.SUCCESS).build());
-    }
+    private static final Logger log = LoggerFactory.getLogger(JDBCTaskExecutor.class);
 }

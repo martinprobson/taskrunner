@@ -6,13 +6,16 @@ import net.martinprobson.jobrunner.FailureTaskExecutor;
 import net.martinprobson.jobrunner.TaskProvider;
 import net.martinprobson.jobrunner.TaskResult;
 import net.martinprobson.jobrunner.common.BaseTask;
-import net.martinprobson.jobrunner.common.JobRunnerException;
 import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import net.martinprobson.jobrunner.dummytask.DummyTaskExecutor;
 import net.martinprobson.jobrunner.template.DummyTemplateService;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 
@@ -20,51 +23,57 @@ public class HiveTaskTest {
 
     private static TaskProvider taskProvider;
 
+    private static File createFile(String content) throws Exception {
+        File file = File.createTempFile("JDBCTaskTest","");
+        FileUtils.write(file, content, Charset.defaultCharset());
+        return file;
+    }
+
     @BeforeClass
     public static void setUpBeforeClass() {
         taskProvider = TaskProvider.getInstance();
     }
 
     @Test
-    public void getTaskContents() throws JobRunnerException {
-        BaseTask task = taskProvider.createTask("hive","test","DUMMY");
+    public void getTaskContents() throws Exception {
+        BaseTask task = taskProvider.createTask("hive","test",createFile("DUMMY"));
         assertEquals(task.getTaskContents(),"DUMMY");
     }
 
     @Test
-    public void getTaskId() throws JobRunnerException {
-        BaseTask task = taskProvider.createTask("hive","test","");
+    public void getTaskId() throws Exception {
+        BaseTask task = taskProvider.createTask("hive","test",new File(""));
         assertEquals(task.getId(),"test");
     }
 
     @Test
-    public void TestExecuteSuccess() throws JobRunnerException {
+    public void TestExecuteSuccess() throws Exception {
         BaseTask task = new HiveTask(new DummyTemplateService(),
                 new DummyTaskExecutor(),
                 "test",
-                "DUMMY",
+                createFile("DUMMY"),
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.succeeded());
     }
 
     @Test
-    public void TestExecuteFailure() throws JobRunnerException {
+    public void TestExecuteFailure() throws Exception {
         BaseTask task = new HiveTask(new DummyTemplateService(),
                 new FailureTaskExecutor(),
                 "test",
-                "DUMMY",
+                createFile("DUMMY"),
                 GlobalConfigurationProvider.get().getConfiguration());
         TaskResult result = task.execute();
         assertTrue(result.failed());
     }
 
     @Test
-    public void TestExecuteException() throws JobRunnerException {
+    public void TestExecuteException() throws Exception {
         BaseTask task = new HiveTask(new DummyTemplateService(),
                 new ExceptionTaskExecutor(),
                 "test",
-                "DUMMY",
+                createFile("DUMMY"),
                 GlobalConfigurationProvider.get().getConfiguration());
         try {
             TaskResult result = task.execute();

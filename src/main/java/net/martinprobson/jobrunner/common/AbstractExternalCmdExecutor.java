@@ -74,9 +74,8 @@ public abstract class AbstractExternalCmdExecutor implements TaskExecutor {
     /**
      * <p>Get the command to run.</p>
      *
-     * @throws JobRunnerException If there is an issue with the environment.
      */
-    protected abstract String getCmd() throws JobRunnerException;
+    protected abstract String getCmd();
 
     /**
      * <p>Get the command arguments.</p>
@@ -104,6 +103,10 @@ public abstract class AbstractExternalCmdExecutor implements TaskExecutor {
         cmd.setCmd(getCmd())
                 .withArgs(getArgs(task))
                 .withTimeoutMillis(getTimeOutMs(task));
+        log.trace("About to execute: " + task.getId());
+        log.trace("Cmd: " + getCmd());
+        for (String arg : getArgs(task))
+            log.trace("Arg: " + arg);
         return cmd.run();
     }
 

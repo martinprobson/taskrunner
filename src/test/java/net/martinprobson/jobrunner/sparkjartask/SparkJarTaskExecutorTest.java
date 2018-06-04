@@ -6,14 +6,24 @@ import net.martinprobson.jobrunner.TaskProvider;
 import net.martinprobson.jobrunner.TaskResult;
 import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.JobRunnerException;
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 
 public class SparkJarTaskExecutorTest {
 
     private static TaskProvider taskProvider;
+
+    private static File createFile(String content) throws Exception {
+        File file = File.createTempFile("SparkJarTaskTest",".jar");
+        FileUtils.write(file, content, Charset.defaultCharset());
+        return file;
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -23,7 +33,7 @@ public class SparkJarTaskExecutorTest {
     @Test
     public void checkEnv() throws Exception {
         Config config = ConfigFactory.parseString("spark-jar { environment = ['dummy'] }");
-        BaseTask task = taskProvider.createTask("spark-jar","test","", config);
+        BaseTask task = taskProvider.createTask("spark-jar","test",new File(""), config);
         SparkJarTaskExecutor executor = new SparkJarTaskExecutor();
         try {
             executor.checkEnv(task);
@@ -36,8 +46,8 @@ public class SparkJarTaskExecutorTest {
 
     @Test
     public void execute() throws Exception {
-        BaseTask task = taskProvider.createTask("spark-jar","test","");
+        BaseTask task = taskProvider.createTask("spark-jar","test",createFile("DUMMY"));
         TaskResult taskResult = task.execute();
-        assertTrue(taskResult.getProcString().endsWith("/bin/spark-submit --master local[*] --num-executors 2 --queue default "));
+        assertTrue(taskResult.getProcString().contains("spark-submit --master local[*] --num-executors 2 --queue default"));
     }
 }

@@ -14,6 +14,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,6 +23,7 @@ import static org.junit.Assert.fail;
 public class SparkJarTaskTest {
 
     private static TaskProvider taskProvider;
+    private static final File jar = new File("DUMMY.jar");
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -29,20 +32,18 @@ public class SparkJarTaskTest {
 
     @Test
     public void getTaskContents() throws JobRunnerException {
-        String jar = "DUMMY";
-        BaseTask task = taskProvider.createTask("spark-jar","test",jar);
-        assertEquals(task.getTaskContents(),jar);
+        BaseTask task = taskProvider.createTask("spark-jar","test",(jar));
+        assertEquals(task.getTaskFile(),jar);
     }
 
     @Test
     public void getTaskId() throws JobRunnerException {
-        BaseTask task = taskProvider.createTask("spark-jar","test","");
+        BaseTask task = taskProvider.createTask("spark-jar","test",jar);
         assertEquals(task.getId(),"test");
     }
 
     @Test
     public void TestExecuteSuccess() throws JobRunnerException {
-        String jar = "DUMMY.jar";
         BaseTask task = new SparkJarTask(new DummyTemplateService(),
                 new DummyTaskExecutor(),
                 "test",
@@ -54,7 +55,6 @@ public class SparkJarTaskTest {
 
     @Test
     public void TestExecuteFailure() throws JobRunnerException {
-        String jar = "DUMMY.jar";
         BaseTask task = new SparkJarTask(new DummyTemplateService(),
                 new FailureTaskExecutor(),
                 "test",
@@ -66,7 +66,6 @@ public class SparkJarTaskTest {
 
     @Test
     public void TestExecuteException() throws JobRunnerException {
-        String jar = "DUMMY.jar";
         BaseTask task = new SparkJarTask(new DummyTemplateService(),
                 new ExceptionTaskExecutor(),
                 "test",

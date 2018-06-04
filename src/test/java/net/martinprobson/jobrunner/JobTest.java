@@ -6,6 +6,7 @@ import net.martinprobson.jobrunner.common.JobRunnerException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class JobTest {
         HashMap<String, BaseTask> tasks = new HashMap<>();
         String taskNames[] = {"t1", "t2", "t3", "t4","t5","t6","t7"};
         for (String task : taskNames)
-            tasks.put(task, taskProvider.createTask("dummy",task,""));
+            tasks.put(task, taskProvider.createTask("dummy",task,new File("")));
         return tasks;
     }
 
@@ -63,5 +64,22 @@ public class JobTest {
         for (String k: expectedTasks.keySet()) {
             assertTrue(actual.toLowerCase().contains("id: [" + k));
         }
+    }
+
+    @Test
+    public void getId() {
+        for (String k: expectedTasks.keySet()) assertEquals(expectedTasks.get(k), job.getId(k));
+    }
+
+    @Test
+    public void status() {
+        String testStr = job.status();
+        for (String k: expectedTasks.keySet()) assertTrue(testStr.contains(k));
+        assertEquals(7,testStr.split("NOT_EXECUTED",-1).length - 1);
+    }
+
+    @Test
+    public void size() {
+        assertEquals(7,job.size());
     }
 }

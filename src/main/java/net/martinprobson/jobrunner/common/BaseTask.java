@@ -11,10 +11,13 @@ import net.martinprobson.jobrunner.TaskResult;
 import net.martinprobson.jobrunner.configurationservice.GlobalConfigurationProvider;
 import net.martinprobson.jobrunner.template.TemplateException;
 import net.martinprobson.jobrunner.template.TemplateService;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,7 +28,7 @@ import java.util.Objects;
  * <p>The base class for all {@code JobRunner} tasks.</p><p></p>
  * <p>A Task consists of : -</p>
  * <ol><li>A <code>Task id</code> - String (that uniquely identifies a task within a task group).</li>
- * <li>The task contents (for example SQL code) held as a String.</li>
+ * <li>A taskFile - The name of the file containing the task contents.</li>
  * <li>An optional, Task specific config. Either
  * supplied via a <code>Config</code> class or loaded from the file system as a config file. The task specific
  * config can contain task dependency information and/or template parameters.
@@ -49,9 +52,9 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     private final String taskId;
 
     /**
-     * The task contents
+     * The name of the file containing the task contents
      */
-    private final String task;
+    private final File taskFile;
 
     /**
      * The TaskResult
@@ -74,15 +77,15 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * Construct a new Task with the given id and contents.
      * @param id    task id.
-     * @param task  task contents.
+     * @param taskFile  File containing the task contents.
      * @param taskConfig The task specific config.
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
-    protected BaseTask(String id, String task, Config taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
+    protected BaseTask(String id, File taskFile, Config taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
         super.setId(id);
         this.taskId = id;
-        this.task = task;
+        this.taskFile = taskFile;
         this.config = taskConfig.withFallback(GlobalConfigurationProvider.get().getConfiguration());
         this.templateService = templateService;
         this.taskExecutor = taskExecutor;
@@ -93,19 +96,19 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * Construct a new Task with the given id and contents.
      * @param id    task id.
-     * @param task  task contents.
+     * @param taskFile  Name of the file containing the task contents.
      * @param taskConfig File from which task specific config will be loaded.
      * @param templateService The template service provider.
      * @param taskExecutor The task executor service responsible for executing tasks of this type.
      */
-    private BaseTask(String id, String task, File taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
-        this(id,task,ConfigFactory.parseFile(taskConfig),templateService,taskExecutor);
+    private BaseTask(String id, File taskFile, File taskConfig, TemplateService templateService, TaskExecutor taskExecutor) {
+        this(id,taskFile,ConfigFactory.parseFile(taskConfig),templateService,taskExecutor);
     }
 
     @Override
     public String toString() {
         return  getClass().getName() + "{id = " + taskId +
-                ",task='" + task + '\'' +
+                ",taskFile='" + taskFile.getAbsolutePath() + '\'' +
                 ",result=" + result + "}";
     }
 
@@ -118,14 +121,23 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     }
 
     /**
+     * @return the taskFile.
+     */
+    public File getTaskFile() { return taskFile; }
+
+    /**
      * @return the task contents.
      */
-    public String getTaskContents() {
-        return task;
+    public String getTaskContents() throws JobRunnerException {
+        try {
+            return FileUtils.readFileToString(taskFile, Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new JobRunnerException("Error reading file.",e);
+        }
     }
 
     /**
-     * @return the task contents after template has been applied
+     * @return the taskFile contents after template has been applied
      */
     public String getRenderedTaskContents() throws JobRunnerException {
         try {
@@ -143,7 +155,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     public TaskResult getTaskResult() { return result; }
 
     /**
-     * Return the Configuration for this task.
+     * Return the Configuration for this taskFile.
      *
      * @return Config {@link com.typesafe.config.Config}
      */
@@ -152,7 +164,7 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     }
 
     /**
-     * Set the {@code TaskResult} for this task.
+     * Set the {@code TaskResult} for this taskFile.
      * @param t - TaskResult
      * @return The TaskResult just set.
      */
@@ -172,13 +184,13 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     }
 
     /**
-     * {@code shouldExecute} Is this task executable?
+     * {@code shouldExecute} Is this taskFile executable?
      *
-     * <p>This method is called to determine if the task can execute. A task is considered executable
+     * <p>This method is called to determine if the taskFile can execute. A taskFile is considered executable
      * if all its parent dependencies are not in a failed state.</p>
      *
      * @param parentResults List of parent {@code TaskResults}, keyed by {@code taskid}
-     * @return {@code true} if the task can execute, {@code false otherwise}
+     * @return {@code true} if the taskFile can execute, {@code false otherwise}
      */
     public boolean shouldExecute(ExecutionResults<String, TaskResult> parentResults) {
         for (ExecutionResult<String, TaskResult> result : parentResults.getAll()) {
@@ -190,13 +202,13 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     /**
      * <h3>{@code execute}</h3>
      *
-     * <p>Executes this task via a {@code TaskExecutor}.</p>
+     * <p>Executes this taskFile via a {@code TaskExecutor}.</p>
      *
      * @return set to {@code SUCCESSFUL} if execution successful, {@code FAILED} if error occurs.
      * @throws TaskExecutionException thrown when a execution problem is encountered.
      */
     public TaskResult execute() throws TaskExecutionException {
-        log.trace("About to execute task id: " + this.getId());
+        log.trace("About to execute taskFile id: " + this.getId());
         setTaskResult(new TaskResult.Builder(TaskResult.Result.RUNNING).build());
         TaskResult taskResult;
         try {
@@ -213,10 +225,10 @@ public abstract class BaseTask extends Task<String, TaskResult> {
     }
 
     /**
-     * Tasks are considered equal if they have the same task id, and task contents.
+     * Tasks are considered equal if they have the same taskFile id, and taskFile contents.
      *
      * @param other the other object to compare.
-     * @return {@code true} if tasks match on {@code task, taskId and result}, {@code false}</code>
+     * @return {@code true} if tasks match on {@code taskFile, taskId and result}, {@code false}</code>
      * otherwise.
      */
     @Override
@@ -232,12 +244,12 @@ public abstract class BaseTask extends Task<String, TaskResult> {
         }
         BaseTask o = (BaseTask) other;
         return Objects.equals(taskId, o.getId()) &&
-                Objects.equals(task, o.getTaskContents());
+                Objects.equals(getTaskFile(), o.getTaskFile());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskId, task);
+        return Objects.hash(taskId, taskFile);
     }
 
     /**

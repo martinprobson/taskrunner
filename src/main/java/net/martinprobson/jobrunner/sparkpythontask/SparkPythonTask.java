@@ -27,6 +27,8 @@ import net.martinprobson.jobrunner.template.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 
 /**
  * <p>{@code SparkPythonTask}</p>
@@ -47,16 +49,16 @@ class SparkPythonTask extends BaseTask {
      * Creates a SparkPythonTask with the specified id,python code and task configuration.
      *
      * @param taskId             Task Id
-     * @param content            Spark python script code to run.
+     * @param taskFile           File containing the Spark python script code to run.
      * @param taskConfiguration  Task configuration filename.
      */
     @AssistedInject
     SparkPythonTask(@Named("spark-python") TemplateService templateService,
                     @Named("spark-python") TaskExecutor executor,
-                    @Assisted("taskid") String taskId,
-                    @Assisted("content") String content,
+                    @Assisted String taskId,
+                    @Assisted File taskFile,
                     @Assisted Config taskConfiguration) {
-        super(taskId,content,taskConfiguration,templateService,executor);
+        super(taskId,taskFile,taskConfiguration,templateService,executor);
     }
 
 }

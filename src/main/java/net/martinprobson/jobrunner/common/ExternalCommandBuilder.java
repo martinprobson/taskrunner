@@ -19,6 +19,6 @@ public interface ExternalCommandBuilder {
     ExternalCommandBuilder setCmd(String cmd);
     ExternalCommandBuilder withArgs(String ...args);
     void withTimeoutMillis(long timeoutMillis);
-    TaskResult run();
+    TaskResult run() throws JobRunnerException;
 
 }

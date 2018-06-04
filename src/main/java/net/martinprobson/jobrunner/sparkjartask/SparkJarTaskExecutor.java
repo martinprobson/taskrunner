@@ -63,7 +63,7 @@ class SparkJarTaskExecutor extends AbstractExternalCmdExecutor implements TaskEx
             args.add("--driver-java-options");
             args.add(task.getConfig().getString("spark-jar.driver-java-options"));
         }
-        args.add(task.getTaskContents());
+        args.add(task.getTaskFile().getAbsolutePath());
         return args.toArray(new String[0]);
     }
 }

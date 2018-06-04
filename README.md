@@ -10,7 +10,7 @@
 
 ## Features
 
-* Suports the running of the following task types out of the box: -
+* Supports the running of the following task types out of the box: -
 
     - JDBC - SQL code that can be run against a standard JDBC connection. File extension `.sql`.
     - Hive HQL -  [Apache Hive HQL](https://cwiki.apache.org/confluence/display/Hive/LanguageManual) run using the Hive CLI. File extension `.hql`.

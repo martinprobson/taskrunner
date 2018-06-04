@@ -9,6 +9,8 @@ import net.martinprobson.jobrunner.common.BaseTask;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.TemplateService;
 
+import java.io.File;
+
 /**
  * A {@code DummyTask} A task with no content that always returns SUCCESS when executed.
  *
@@ -17,12 +19,12 @@ import net.martinprobson.jobrunner.template.TemplateService;
 class DummyTask extends BaseTask {
 
     @AssistedInject
-    private DummyTask(  @Assisted("id") String id,
-                        @Assisted("task") String task,
+    private DummyTask(  @Assisted String id,
+                        @Assisted File taskFile,
                         @Assisted Config taskConfiguration,
                         TemplateService templateService,
                         @Named("dummy") TaskExecutor taskExecutor) {
-        super(id,task,taskConfiguration,templateService,taskExecutor);
+        super(id,taskFile,taskConfiguration,templateService,taskExecutor);
     }
 
 }

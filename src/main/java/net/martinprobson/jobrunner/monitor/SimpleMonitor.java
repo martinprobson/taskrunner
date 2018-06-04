@@ -13,9 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class SimpleMonitor {
-    private static final Logger log = LoggerFactory.getLogger(SimpleMonitor.class);
-    private final Job job;
-    private final ScheduledExecutorService monitorService = Executors.newSingleThreadScheduledExecutor();
 
     public static SimpleMonitor getInstance(Job job) {
         return new SimpleMonitor(job);
@@ -26,7 +23,7 @@ public class SimpleMonitor {
     }
 
     private void monitor() {
-        job.printStatus();
+        log.info(job.status());
     }
 
     public void start() {
@@ -39,19 +36,9 @@ public class SimpleMonitor {
         monitor();
     }
 
-    public static void main(String args[]) {
-        String testDir = new File(Objects.requireNonNull(RunJob.class.getClassLoader().getResource("example2")).getFile()).getAbsolutePath();
-        try {
-            Job job = new Job(LocalFileSystemTaskBuilder.create(testDir, testDir));
-            SimpleMonitor monitor = SimpleMonitor.getInstance(job);
-            monitor.start();
-            TimeUnit.SECONDS.sleep(30);
-            monitor.stop();
-
-        } catch (JobRunnerException | InterruptedException e) {
-            log.error("Unexpected Exception: " + e);
-        }
-    }
+    private static final Logger log = LoggerFactory.getLogger(SimpleMonitor.class);
+    private final Job job;
+    private final ScheduledExecutorService monitorService = Executors.newSingleThreadScheduledExecutor();
 }
 
 
