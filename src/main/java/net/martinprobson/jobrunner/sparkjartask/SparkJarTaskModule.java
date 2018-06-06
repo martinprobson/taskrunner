@@ -7,6 +7,8 @@ import net.martinprobson.jobrunner.TaskFactory;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.DummyTemplateService;
 import net.martinprobson.jobrunner.template.TemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h3>{@code SparkJarTaskModule}</h3>
@@ -22,6 +24,7 @@ public class SparkJarTaskModule extends AbstractModule {
 
     @Override
     public void configure() {
+        log.debug("Configuring SparkJarTask");
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
         //TODO FactoryProvider is deprecated
         mapBinder.addBinding("spark-jar").toProvider(com.google.inject.assistedinject.FactoryProvider.newFactory(TaskFactory.class, SparkJarTask.class));
@@ -31,5 +34,7 @@ public class SparkJarTaskModule extends AbstractModule {
         // We do need an executor service however...
         bind(TaskExecutor.class).annotatedWith(Names.named("spark-jar")).to(SparkJarTaskExecutor.class);
     }
+
+    private static final Logger log = LoggerFactory.getLogger(SparkJarTaskModule.class);
 
 }

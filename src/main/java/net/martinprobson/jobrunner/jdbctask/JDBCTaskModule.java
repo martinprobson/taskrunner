@@ -7,6 +7,8 @@ import net.martinprobson.jobrunner.TaskFactory;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.FreeMarkerTemplateService;
 import net.martinprobson.jobrunner.template.TemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h3>{@code JDBCTaskModule}</h3>
@@ -23,6 +25,7 @@ public class JDBCTaskModule extends AbstractModule {
 
     @Override
     public void configure() {
+        log.debug("Configuring JDBCTask");
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
 
         //TODO FactoryProvider is deprecated
@@ -32,5 +35,7 @@ public class JDBCTaskModule extends AbstractModule {
         bind(TemplateService.class).to(FreeMarkerTemplateService.class);
         bind(TaskExecutor.class).annotatedWith(Names.named("jdbc")).to(JDBCTaskExecutor.class);
     }
+
+    private static final Logger log = LoggerFactory.getLogger(JDBCTaskModule.class);
 
 }

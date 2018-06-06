@@ -97,7 +97,7 @@ public abstract class AbstractExternalCmdExecutor implements TaskExecutor {
     }
 
     private TaskResult execute(BaseTask task) throws JobRunnerException {
-        log.trace(getClass().getName() + " executeTask - " + task.getId());
+        log.info(getClass().getName() + " executeTask - " + task.getId());
         checkEnv(task);
         Kerberos.auth();
         cmd.setCmd(getCmd())

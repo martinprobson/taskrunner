@@ -7,6 +7,8 @@ import net.martinprobson.jobrunner.TaskFactory;
 import net.martinprobson.jobrunner.common.TaskExecutor;
 import net.martinprobson.jobrunner.template.FreeMarkerTemplateService;
 import net.martinprobson.jobrunner.template.TemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h3>{@code SparkJarTaskModule}</h3>
@@ -22,6 +24,7 @@ public class HiveTaskModule extends AbstractModule {
 
     @Override
     public void configure() {
+        log.debug("Configuring HiveTask");
         MapBinder<String, TaskFactory> mapBinder = MapBinder.newMapBinder(binder(), String.class, TaskFactory.class);
         //TODO FactoryProvider is deprecated.
         mapBinder.addBinding("hive").toProvider(com.google.inject.assistedinject.FactoryProvider.newFactory(TaskFactory.class, HiveTask.class));
@@ -30,5 +33,7 @@ public class HiveTaskModule extends AbstractModule {
         bind(TemplateService.class).to(FreeMarkerTemplateService.class);
         bind(TaskExecutor.class).annotatedWith(Names.named("hive")).to(HiveTaskExecutor.class);
     }
+
+    private static final Logger log = LoggerFactory.getLogger(HiveTaskModule.class);
 
 }
